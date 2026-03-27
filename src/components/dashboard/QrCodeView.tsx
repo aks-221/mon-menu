@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Download, QrCode } from "lucide-react";
 
-const QrCodeView = () => {
+const QrCodeView = ({ restaurant }: { restaurant: any }) => {
+  const url = `${window.location.origin}/restaurant/${restaurant.slug}`;
+
   return (
     <div className="space-y-6 max-w-md">
       <div>
@@ -15,9 +17,7 @@ const QrCodeView = () => {
             <QrCode className="h-32 w-32 text-foreground" />
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">
-          menuup.app/<span className="font-medium text-foreground">chez-fatou</span>
-        </p>
+        <p className="text-sm text-muted-foreground break-all">{url}</p>
         <Button className="gradient-primary text-primary-foreground shadow-warm rounded-xl">
           <Download className="h-4 w-4 mr-2" />
           Télécharger en PNG

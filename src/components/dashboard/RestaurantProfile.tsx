@@ -3,19 +3,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Save } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
+import { updateRestaurant } from "@/lib/api";
+import { toast } from "sonner";
 
-const RestaurantProfile = () => {
+const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate: (r: any) => void }) => {
   const [profile, setProfile] = useState({
-    name: "Chez Fatou",
-    slogan: "Le goût authentique du Sénégal",
-    description: "Restaurant de cuisine sénégalaise traditionnelle au cœur de Dakar. Thiéboudienne, Yassa, Mafé et bien plus.",
-    cuisineType: "Cuisine locale",
-    address: "Rue 10, Médina, Dakar",
-    phone: "+221 77 123 45 67",
-    whatsapp: "+221 77 123 45 67",
-    primaryColor: "#f97316",
+    name: restaurant.name || "",
+    slogan: restaurant.slogan || "",
+    description: restaurant.description || "",
+    cuisine_type: restaurant.cuisine_type || "",
+    address: restaurant.address || "",
+    phone: restaurant.phone || "",
+    whatsapp: restaurant.whatsapp || "",
+    primary_color: restaurant.primary_color || "#f97316",
+    social_facebook: restaurant.social_facebook || "",
+    social_instagram: restaurant.social_instagram || "",
   });
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await updateRestaurant(restaurant.id, profile);
+      onUpdate({ ...restaurant, ...profile });
+      toast.success("Profil mis à jour !");
+    } catch {
+      toast.error("Erreur lors de la sauvegarde");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -32,7 +50,7 @@ const RestaurantProfile = () => {
           </div>
           <div className="space-y-2">
             <Label>Type de cuisine</Label>
-            <Input value={profile.cuisineType} onChange={(e) => setProfile({ ...profile, cuisineType: e.target.value })} className="rounded-xl" />
+            <Input value={profile.cuisine_type} onChange={(e) => setProfile({ ...profile, cuisine_type: e.target.value })} className="rounded-xl" />
           </div>
         </div>
         <div className="space-y-2">
@@ -57,21 +75,26 @@ const RestaurantProfile = () => {
           <Label>Adresse</Label>
           <Input value={profile.address} onChange={(e) => setProfile({ ...profile, address: e.target.value })} className="rounded-xl" />
         </div>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Facebook</Label>
+            <Input placeholder="https://facebook.com/..." value={profile.social_facebook} onChange={(e) => setProfile({ ...profile, social_facebook: e.target.value })} className="rounded-xl" />
+          </div>
+          <div className="space-y-2">
+            <Label>Instagram</Label>
+            <Input placeholder="https://instagram.com/..." value={profile.social_instagram} onChange={(e) => setProfile({ ...profile, social_instagram: e.target.value })} className="rounded-xl" />
+          </div>
+        </div>
         <div className="space-y-2">
           <Label>Couleur principale</Label>
           <div className="flex items-center gap-3">
-            <input
-              type="color"
-              value={profile.primaryColor}
-              onChange={(e) => setProfile({ ...profile, primaryColor: e.target.value })}
-              className="w-10 h-10 rounded-lg border border-border cursor-pointer"
-            />
-            <span className="text-sm text-muted-foreground">{profile.primaryColor}</span>
+            <input type="color" value={profile.primary_color} onChange={(e) => setProfile({ ...profile, primary_color: e.target.value })} className="w-10 h-10 rounded-lg border border-border cursor-pointer" />
+            <span className="text-sm text-muted-foreground">{profile.primary_color}</span>
           </div>
         </div>
 
-        <Button className="gradient-primary text-primary-foreground shadow-warm rounded-xl">
-          <Save className="h-4 w-4 mr-2" />
+        <Button onClick={handleSave} disabled={saving} className="gradient-primary text-primary-foreground shadow-warm rounded-xl">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
           Sauvegarder
         </Button>
       </div>
