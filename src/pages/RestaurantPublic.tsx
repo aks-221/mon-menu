@@ -4,9 +4,12 @@ import {
   MapPin, Clock, Phone, MessageCircle, Star, Loader2,
   Instagram, Facebook, ShoppingBag, Plus, Minus, ChefHat,
   Heart, Award, Mail, ChevronDown, Menu as MenuIcon, X,
-  UtensilsCrossed, MapPinned, CalendarClock, MessageSquare, PhoneCall
+  UtensilsCrossed, MapPinned, CalendarClock, MessageSquare, PhoneCall,
+  CalendarDays
 } from "lucide-react";
 import { fetchRestaurantBySlug, fetchCategories, fetchDishes, fetchBusinessHours } from "@/lib/api";
+import CheckoutModal from "@/components/checkout/CheckoutModal";
+import ReservationModal from "@/components/checkout/ReservationModal";
 
 const DAY_NAMES = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
