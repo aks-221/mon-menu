@@ -33,7 +33,8 @@ const RestaurantPublic = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [showReservation, setShowReservation] = useState(false);
   useEffect(() => {
     const load = async () => {
       try {
