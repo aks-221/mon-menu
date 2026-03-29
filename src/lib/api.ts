@@ -139,6 +139,7 @@ export const addDish = async (dish: {
   description: string;
   price: number;
   tags: string[];
+  image_url?: string;
 }) => {
   const { data, error } = await supabase
     .from("dishes")
