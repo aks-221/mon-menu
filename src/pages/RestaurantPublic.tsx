@@ -1,9 +1,23 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { MapPin, Clock, Phone, MessageCircle, Star, ChevronRight, Loader2, Instagram, Facebook, ShoppingBag, Plus, Minus } from "lucide-react";
+import {
+  MapPin, Clock, Phone, MessageCircle, Star, Loader2,
+  Instagram, Facebook, ShoppingBag, Plus, Minus, ChefHat,
+  Heart, Award, Mail, ChevronDown, Menu as MenuIcon, X,
+  UtensilsCrossed, MapPinned, CalendarClock, MessageSquare, PhoneCall
+} from "lucide-react";
 import { fetchRestaurantBySlug, fetchCategories, fetchDishes, fetchBusinessHours } from "@/lib/api";
 
 const DAY_NAMES = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+
+const NAV_SECTIONS = [
+  { id: "accueil", label: "Accueil" },
+  { id: "menu", label: "Menu" },
+  { id: "about", label: "À Propos" },
+  { id: "location", label: "Emplacement" },
+  { id: "hours", label: "Horaires" },
+  { id: "contact", label: "Contact" },
+];
 
 const RestaurantPublic = () => {
   const { slug } = useParams();
@@ -15,18 +29,16 @@ const RestaurantPublic = () => {
   const [selectedItems, setSelectedItems] = useState<{ id: string; name: string; price: number; qty: number }[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const actualSlug = slug || "demo";
-        const r = await fetchRestaurantBySlug(actualSlug);
+        const r = await fetchRestaurantBySlug(slug || "demo");
         if (!r) { setNotFound(true); setLoading(false); return; }
         setRestaurant(r);
         const [cats, dsh, hrs] = await Promise.all([
-          fetchCategories(r.id),
-          fetchDishes(r.id),
-          fetchBusinessHours(r.id),
+          fetchCategories(r.id), fetchDishes(r.id), fetchBusinessHours(r.id),
         ]);
         setCategories(cats);
         setDishes(dsh);
@@ -40,7 +52,7 @@ const RestaurantPublic = () => {
     load();
   }, [slug]);
 
-  const brand = restaurant?.primary_color || "#F59E0B";
+  const brand = restaurant?.primary_color || "#16a34a";
 
   const { isOpen, todayHours } = useMemo(() => {
     const now = new Date();
@@ -58,6 +70,8 @@ const RestaurantPublic = () => {
     return activeCategory === "all" ? available : available.filter(d => d.category_id === activeCategory);
   }, [dishes, activeCategory]);
 
+  const popularDishes = useMemo(() => dishes.filter(d => d.is_popular && d.is_available), [dishes]);
+
   const toggleItem = (item: any) => {
     setSelectedItems((prev) => {
       const exists = prev.find(i => i.id === item.id);
@@ -67,14 +81,11 @@ const RestaurantPublic = () => {
   };
 
   const updateQty = (id: string, delta: number) => {
-    setSelectedItems(prev => {
-      return prev.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i);
-    });
+    setSelectedItems(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i));
   };
 
   const isSelected = (id: string) => selectedItems.some(i => i.id === id);
   const getQty = (id: string) => selectedItems.find(i => i.id === id)?.qty || 0;
-
   const totalPrice = selectedItems.reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
   const totalItems = selectedItems.reduce((sum, i) => sum + i.qty, 0);
 
@@ -84,329 +95,540 @@ const RestaurantPublic = () => {
     : `Bonjour ${restaurant?.name} ! Je souhaite passer une commande.`;
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setMobileMenuOpen(false);
+  };
+
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "#FAFAFA" }}>
+    <div className="min-h-screen flex items-center justify-center bg-white">
       <Loader2 className="h-8 w-8 animate-spin" style={{ color: brand }} />
     </div>
   );
 
   if (notFound || !restaurant) return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#FAFAFA" }}>
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="text-center space-y-4">
         <h1 className="text-2xl font-bold text-gray-900">Restaurant non trouvé 😕</h1>
         <p className="text-gray-500">Ce restaurant n'existe pas ou n'est plus en ligne.</p>
-        <Link to="/">
-          <button className="px-6 py-3 rounded-xl font-semibold text-white" style={{ backgroundColor: brand }}>Retour à l'accueil</button>
-        </Link>
+        <Link to="/"><button className="px-6 py-3 rounded-lg font-semibold text-white" style={{ backgroundColor: brand }}>Retour à l'accueil</button></Link>
       </div>
     </div>
   );
 
-  const openTime = todayHours?.open_time?.slice(0, 5) || "08:00";
-  const closeTime = todayHours?.close_time?.slice(0, 5) || "22:00";
-
-  // Lighter brand for backgrounds
-  const brandLight = `${brand}18`;
-  const brandMedium = `${brand}30`;
+  const brandLight = `${brand}15`;
 
   return (
-    <div className="min-h-screen" style={{ background: "#F5F5F0" }}>
-
-      {/* ═══════════════════════════════════════════
-          HERO — Cover + Restaurant Card
-      ═══════════════════════════════════════════ */}
-      <section className="relative">
-        {/* Cover photo */}
-        <div className="w-full h-56 sm:h-64 overflow-hidden">
-          {restaurant.cover_url ? (
-            <img src={restaurant.cover_url} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        </div>
-
-        {/* Restaurant info card — overlapping cover */}
-        <div className="relative -mt-28 px-4 max-w-md mx-auto z-10">
-          <div className="bg-white rounded-3xl shadow-xl p-5" style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.10)" }}>
-            <div className="flex items-start gap-4">
-              {/* Logo */}
-              <div
-                className="w-20 h-20 rounded-2xl flex-shrink-0 overflow-hidden border-[3px]"
-                style={{ borderColor: brand }}
-              >
-                {restaurant.logo_url ? (
-                  <img src={restaurant.logo_url} alt={restaurant.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-3xl" style={{ backgroundColor: brandLight }}>🍽️</div>
-                )}
-              </div>
-
-              <div className="flex-1 min-w-0 pt-1">
-                <h1 className="text-xl font-extrabold text-gray-900 leading-tight">{restaurant.name}</h1>
-                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                  {restaurant.cuisine_type && (
-                    <span
-                      className="text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1"
-                      style={{ backgroundColor: brandLight, color: brand }}
-                    >
-                      🍔 {restaurant.cuisine_type}
-                    </span>
-                  )}
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 ${
-                    isOpen ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-500"
-                  }`}>
-                    {isOpen ? "✓ Ouvert" : "✕ Fermé"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Slogan */}
-            {restaurant.slogan && (
-              <p className="text-sm text-gray-400 mt-3 italic">{restaurant.slogan}</p>
+    <div className="min-h-screen bg-white">
+      {/* ══════════ NAVBAR ══════════ */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {restaurant.logo_url ? (
+              <img src={restaurant.logo_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+            ) : (
+              <UtensilsCrossed className="w-6 h-6" style={{ color: brand }} />
             )}
+            <span className="font-bold text-gray-900 text-sm">{restaurant.name}</span>
+          </div>
 
-            {/* Address */}
-            {restaurant.address && (
-              <div className="flex items-center gap-2 mt-3 text-sm text-gray-500">
-                <MapPin className="h-4 w-4 flex-shrink-0" style={{ color: brand }} />
-                <span>{restaurant.address}</span>
-              </div>
-            )}
-
-            {/* WhatsApp CTA — prominent */}
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-6">
+            {NAV_SECTIONS.map(s => (
+              <button key={s.id} onClick={() => scrollTo(s.id)} className="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                {s.label}
+              </button>
+            ))}
             {whatsappNumber && (
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="block mt-4">
-                <button
-                  className="w-full py-4 rounded-2xl text-base font-bold text-white flex items-center justify-center gap-2 transition-transform active:scale-[0.97]"
-                  style={{
-                    backgroundColor: brand,
-                    boxShadow: `0 6px 20px ${brandMedium}`,
-                  }}
-                >
-                  <MessageCircle className="h-5 w-5" />
-                  Commander sur WhatsApp
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white" style={{ backgroundColor: brand }}>
+                  <Phone className="h-4 w-4" /> Commander
                 </button>
               </a>
             )}
           </div>
+
+          {/* Mobile hamburger */}
+          <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+          </button>
         </div>
-      </section>
 
-      {/* ═══════════════════════════════════════════
-          MENU
-      ═══════════════════════════════════════════ */}
-      <section className="mt-8 max-w-md mx-auto px-4">
-        <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-          📋 Menu
-        </h2>
-
-        {/* Category pills */}
-        {categories.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto pb-4 -mx-1 px-1 scrollbar-hide">
-            <button
-              onClick={() => setActiveCategory("all")}
-              className="text-sm px-5 py-2.5 rounded-full whitespace-nowrap font-semibold transition-all"
-              style={
-                activeCategory === "all"
-                  ? { backgroundColor: brand, color: "#fff", boxShadow: `0 4px 14px ${brandMedium}` }
-                  : { backgroundColor: "#fff", color: "#666", border: "1px solid #E5E5E5" }
-              }
-            >
-              Tous
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className="text-sm px-5 py-2.5 rounded-full whitespace-nowrap font-semibold transition-all"
-                style={
-                  activeCategory === cat.id
-                    ? { backgroundColor: brand, color: "#fff", boxShadow: `0 4px 14px ${brandMedium}` }
-                    : { backgroundColor: "#fff", color: "#666", border: "1px solid #E5E5E5" }
-                }
-              >
-                {cat.name}
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-3">
+            {NAV_SECTIONS.map(s => (
+              <button key={s.id} onClick={() => scrollTo(s.id)} className="block w-full text-left text-sm text-gray-700 font-medium py-2 hover:text-gray-900">
+                {s.label}
               </button>
             ))}
           </div>
         )}
+      </nav>
 
-        {/* Dish list */}
-        <div className="space-y-3 pb-4">
-          {filteredDishes.length === 0 ? (
-            <div className="text-center py-16 text-gray-400">
-              <p className="text-5xl mb-3">🍽️</p>
-              <p className="font-medium">Aucun plat disponible.</p>
-            </div>
+      {/* ══════════ HERO ══════════ */}
+      <section id="accueil" className="relative pt-14">
+        <div className="relative h-[70vh] min-h-[400px] max-h-[600px] overflow-hidden">
+          {restaurant.cover_url ? (
+            <img src={restaurant.cover_url} alt="" className="w-full h-full object-cover" />
           ) : (
-            filteredDishes.map((item) => {
-              const selected = isSelected(item.id);
-              const qty = getQty(item.id);
-              return (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-2xl overflow-hidden flex transition-all duration-200"
-                  style={{
-                    border: selected ? `2px solid ${brand}` : "2px solid transparent",
-                    boxShadow: selected ? `0 4px 20px ${brandMedium}` : "0 1px 4px rgba(0,0,0,0.06)",
-                  }}
-                >
-                  {/* Image */}
-                  <div className="w-28 h-auto flex-shrink-0 relative overflow-hidden bg-gray-100">
-                    {item.image_url ? (
-                      <img src={item.image_url} alt={item.name} className="w-full h-full object-cover min-h-[112px]" loading="lazy" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-3xl min-h-[112px]" style={{ backgroundColor: brandLight }}>🍽️</div>
-                    )}
-                  </div>
+            <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-950" />
+          )}
+          <div className="absolute inset-0 bg-black/50" />
 
-                  {/* Info */}
-                  <div className="flex-1 p-3.5 flex flex-col justify-between min-w-0">
-                    <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-bold text-[15px] text-gray-900 leading-snug">{item.name}</h3>
-                        {item.is_popular && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: brandLight, color: brand }}>
-                            Popular
-                          </span>
-                        )}
-                      </div>
-                      {item.description && (
-                        <p className="text-xs text-gray-400 mt-1 line-clamp-2">{item.description}</p>
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+            {/* Logo */}
+            <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6 border-2 border-white/30 overflow-hidden">
+              {restaurant.logo_url ? (
+                <img src={restaurant.logo_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <UtensilsCrossed className="h-10 w-10 text-white" />
+              )}
+            </div>
+
+            <h1 className="text-4xl md:text-5xl font-bold text-white italic">{restaurant.name}</h1>
+            {restaurant.cuisine_type && (
+              <p className="text-lg text-gray-300 mt-2">{restaurant.cuisine_type}</p>
+            )}
+
+            {/* Open/Closed badge */}
+            <div className="mt-5">
+              <span
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold text-white"
+                style={{ backgroundColor: isOpen ? brand : "#ef4444" }}
+              >
+                <span className={`w-2.5 h-2.5 rounded-full ${isOpen ? "bg-green-300 animate-pulse" : "bg-red-300"}`} />
+                {isOpen ? "Ouvert maintenant" : "Fermé"}
+              </span>
+            </div>
+
+            {/* CTA */}
+            {whatsappNumber && (
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="mt-5">
+                <button
+                  className="flex items-center gap-2 px-8 py-3.5 rounded-full text-white font-bold text-base transition-transform hover:scale-105 active:scale-95"
+                  style={{ backgroundColor: brand, boxShadow: `0 4px 20px ${brand}50` }}
+                >
+                  <Phone className="h-5 w-5" />
+                  Commander sur WhatsApp
+                </button>
+              </a>
+            )}
+
+            <ChevronDown className="h-6 w-6 text-white/50 mt-8 animate-bounce" />
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ MENU ══════════ */}
+      <section id="menu" className="py-16 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 italic">Menu</h2>
+          <p className="text-center text-gray-500 mt-2">Découvrez nos plats authentiques préparés avec passion</p>
+
+          {/* Category tabs */}
+          {categories.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-2 mt-8">
+              <button
+                onClick={() => setActiveCategory("all")}
+                className="px-6 py-2.5 rounded-full text-sm font-semibold transition-all"
+                style={activeCategory === "all" ? { backgroundColor: brand, color: "#fff" } : { backgroundColor: "#f3f4f6", color: "#374151" }}
+              >
+                Tout
+              </button>
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  className="px-6 py-2.5 rounded-full text-sm font-semibold transition-all"
+                  style={activeCategory === cat.id ? { backgroundColor: brand, color: "#fff" } : { backgroundColor: "#f3f4f6", color: "#374151" }}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Dish cards — grid with image, name, desc, price, badge */}
+          <div className="grid sm:grid-cols-2 gap-4 mt-10">
+            {filteredDishes.length === 0 ? (
+              <div className="col-span-2 text-center py-16 text-gray-400">
+                <UtensilsCrossed className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                <p>Aucun plat disponible dans cette catégorie.</p>
+              </div>
+            ) : (
+              filteredDishes.map(item => {
+                const selected = isSelected(item.id);
+                const qty = getQty(item.id);
+                return (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-4 p-4 rounded-xl border transition-all hover:shadow-md cursor-pointer"
+                    style={{ borderColor: selected ? brand : "#e5e7eb" }}
+                    onClick={() => !selected && toggleItem(item)}
+                  >
+                    {/* Dish image */}
+                    <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                      {item.image_url ? (
+                        <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-2xl bg-gray-50">🍽️</div>
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between mt-3">
-                      <p className="font-extrabold text-base text-gray-900">
-                        {Number(item.price).toLocaleString()}{" "}
-                        <span className="text-xs font-semibold" style={{ color: brand }}>FCFA</span>
-                      </p>
-
-                      {selected ? (
-                        <div className="flex items-center gap-1.5">
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-bold text-sm text-gray-900">{item.name}</h3>
+                        {item.is_popular && (
+                          <span className="text-[11px] font-bold px-2 py-0.5 rounded text-white flex-shrink-0" style={{ backgroundColor: brand }}>
+                            Populaire
+                          </span>
+                        )}
+                      </div>
+                      {item.description && <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{item.description}</p>}
+                      <div className="flex items-center justify-between mt-2">
+                        <p className="font-bold text-sm" style={{ color: brand }}>
+                          {Number(item.price).toLocaleString()} FCFA
+                        </p>
+                        {selected ? (
+                          <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
+                            <button
+                              onClick={() => qty <= 1 ? toggleItem(item) : updateQty(item.id, -1)}
+                              className="w-7 h-7 rounded-full flex items-center justify-center border"
+                              style={{ borderColor: brand, color: brand }}
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="text-sm font-bold w-5 text-center">{qty}</span>
+                            <button
+                              onClick={() => updateQty(item.id, 1)}
+                              className="w-7 h-7 rounded-full flex items-center justify-center text-white"
+                              style={{ backgroundColor: brand }}
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ) : (
                           <button
-                            onClick={(e) => { e.stopPropagation(); if (qty <= 1) toggleItem(item); else updateQty(item.id, -1); }}
-                            className="w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors"
-                            style={{ borderColor: brand, color: brand }}
-                          >
-                            <Minus className="h-3.5 w-3.5" />
-                          </button>
-                          <span className="text-sm font-bold w-5 text-center text-gray-900">{qty}</span>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); updateQty(item.id, 1); }}
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-colors"
+                            onClick={e => { e.stopPropagation(); toggleItem(item); }}
+                            className="w-7 h-7 rounded-full flex items-center justify-center text-white"
                             style={{ backgroundColor: brand }}
                           >
                             <Plus className="h-3.5 w-3.5" />
                           </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => toggleItem(item)}
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-white transition-all active:scale-90"
-                          style={{ backgroundColor: brand }}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </button>
-                      )}
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════
-          HOURS & INFO
-      ═══════════════════════════════════════════ */}
-      <section className="px-4 max-w-md mx-auto pb-4 mt-4">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">🕒 Horaires & Infos</h2>
-        <div className="bg-white rounded-2xl p-5 space-y-4" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
-          {hours.length > 0 && (
-            <div className="space-y-1">
-              {hours.map((h) => {
-                const now = new Date();
-                const currentDay = (now.getDay() + 6) % 7;
-                const isToday = h.day_of_week === currentDay;
-                return (
-                  <div
-                    key={h.day_of_week}
-                    className={`flex justify-between text-sm py-2 px-3 rounded-xl ${isToday ? "font-bold" : "text-gray-400"}`}
-                    style={isToday ? { backgroundColor: brandLight, color: brand } : {}}
-                  >
-                    <span>{DAY_NAMES[h.day_of_week]}</span>
-                    <span>{h.is_closed ? "Fermé" : `${h.open_time?.slice(0, 5)} – ${h.close_time?.slice(0, 5)}`}</span>
-                  </div>
                 );
-              })}
-            </div>
-          )}
-
-          <div className="border-t border-gray-100 pt-4 space-y-3">
-            {restaurant.address && (
-              <a href={`https://maps.google.com/?q=${encodeURIComponent(restaurant.address)}`} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-3 text-sm text-gray-500 hover:text-gray-800 transition-colors group">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: brandLight }}>
-                  <MapPin className="h-4 w-4" style={{ color: brand }} />
-                </div>
-                <span className="group-hover:underline flex-1">{restaurant.address}</span>
-                <ChevronRight className="h-4 w-4 text-gray-300" />
-              </a>
-            )}
-            {restaurant.phone && (
-              <a href={`tel:${restaurant.phone}`} className="flex items-center gap-3 text-sm text-gray-500 hover:text-gray-800 transition-colors">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: brandLight }}>
-                  <Phone className="h-4 w-4" style={{ color: brand }} />
-                </div>
-                <span>{restaurant.phone}</span>
-              </a>
-            )}
-            {(restaurant.social_instagram || restaurant.social_facebook) && (
-              <div className="flex items-center gap-2 pt-1">
-                {restaurant.social_instagram && (
-                  <a href={restaurant.social_instagram} target="_blank" rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors"
-                    style={{ backgroundColor: brandLight }}>
-                    <Instagram className="h-5 w-5" />
-                  </a>
-                )}
-                {restaurant.social_facebook && (
-                  <a href={restaurant.social_facebook} target="_blank" rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors"
-                    style={{ backgroundColor: brandLight }}>
-                    <Facebook className="h-5 w-5" />
-                  </a>
-                )}
-              </div>
+              })
             )}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <div className="text-center pb-36 pt-6 max-w-md mx-auto">
-        <p className="text-xs text-gray-400">
-          Propulsé par <Link to="/" className="font-semibold hover:underline" style={{ color: brand }}>MenuUp</Link>
-        </p>
-      </div>
+      {/* ══════════ À PROPOS ══════════ */}
+      <section id="about" className="py-16 bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 italic">À Propos</h2>
+          <p className="text-center text-gray-500 mt-2">L'histoire d'une passion culinaire</p>
 
-      {/* ═══════════════════════════════════════════
-          STICKY WHATSAPP BAR
-      ═══════════════════════════════════════════ */}
+          {restaurant.description && (
+            <div className="max-w-2xl mx-auto mt-8">
+              <p className="text-gray-600 leading-relaxed text-center">{restaurant.description}</p>
+            </div>
+          )}
+
+          {/* Values cards */}
+          <div className="grid md:grid-cols-3 gap-6 mt-12">
+            {[
+              { icon: ChefHat, title: "Authenticité", desc: "Recettes traditionnelles et ingrédients authentiques pour un goût unique" },
+              { icon: Heart, title: "Passion", desc: "Chaque plat est préparé avec amour et attention aux détails" },
+              { icon: Award, title: "Qualité", desc: "Ingrédients frais sélectionnés avec soin pour garantir l'excellence" },
+            ].map((v, i) => (
+              <div key={i} className="bg-white rounded-xl p-8 text-center shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4" style={{ backgroundColor: brandLight }}>
+                  <v.icon className="h-7 w-7" style={{ color: brand }} />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-2">{v.title}</h3>
+                <p className="text-sm text-gray-500">{v.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ EMPLACEMENT ══════════ */}
+      <section id="location" className="py-16 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 italic">Notre Emplacement</h2>
+          <p className="text-center text-gray-500 mt-2">Venez nous rendre visite</p>
+
+          <div className="grid md:grid-cols-2 gap-8 mt-10">
+            {/* Map embed */}
+            <div className="rounded-xl overflow-hidden h-72 md:h-80 bg-gray-100">
+              {restaurant.address ? (
+                <iframe
+                  title="location"
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(restaurant.address)}&output=embed`}
+                  allowFullScreen
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <MapPinned className="h-12 w-12" />
+                </div>
+              )}
+            </div>
+
+            {/* Address info */}
+            <div className="flex flex-col justify-center">
+              {restaurant.address && (
+                <div className="flex items-start gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: brandLight }}>
+                    <MapPin className="h-5 w-5" style={{ color: brand }} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900">Adresse</h3>
+                    <p className="text-gray-500 text-sm mt-1">{restaurant.address}</p>
+                  </div>
+                </div>
+              )}
+
+              {restaurant.address && (
+                <a
+                  href={`https://maps.google.com/?q=${encodeURIComponent(restaurant.address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white font-semibold text-sm transition-transform hover:scale-105"
+                  style={{ backgroundColor: brand }}
+                >
+                  <MapPinned className="h-4 w-4" />
+                  Ouvrir dans Google Maps
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════ HORAIRES ══════════ */}
+      <section id="hours" className="py-16 bg-gray-50">
+        <div className="max-w-3xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 italic">Horaires d'Ouverture</h2>
+
+          <div className="flex justify-center mt-4">
+            <span
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold text-white"
+              style={{ backgroundColor: isOpen ? brand : "#ef4444" }}
+            >
+              <span className={`w-2 h-2 rounded-full ${isOpen ? "bg-green-300" : "bg-red-300"}`} />
+              {isOpen ? "Ouvert maintenant" : "Fermé"}
+            </span>
+          </div>
+
+          {hours.length > 0 && (
+            <div className="bg-white rounded-xl shadow-sm mt-8 overflow-hidden">
+              <div className="flex justify-center py-6">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: brandLight }}>
+                  <Clock className="h-7 w-7" style={{ color: brand }} />
+                </div>
+              </div>
+              <div className="px-6 pb-6 space-y-0">
+                {hours.map(h => {
+                  const now = new Date();
+                  const currentDay = (now.getDay() + 6) % 7;
+                  const isToday = h.day_of_week === currentDay;
+                  return (
+                    <div
+                      key={h.day_of_week}
+                      className={`flex justify-between py-3 px-4 border-b border-gray-50 last:border-0 ${isToday ? "font-bold text-gray-900" : "text-gray-500"}`}
+                    >
+                      <span>{DAY_NAMES[h.day_of_week]}</span>
+                      <span>{h.is_closed ? "Fermé" : `${h.open_time?.slice(0, 5)} - ${h.close_time?.slice(0, 5)}`}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="bg-amber-50 text-amber-700 text-sm text-center py-3 px-4">
+                ⚠️ Les horaires peuvent varier pendant les jours fériés
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ══════════ GALERIE (from dish images) ══════════ */}
+      {dishes.filter(d => d.image_url).length >= 4 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-5xl mx-auto px-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 italic">Galerie</h2>
+            <p className="text-center text-gray-500 mt-2">Découvrez notre univers en images</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8">
+              {dishes.filter(d => d.image_url).slice(0, 8).map((d, i) => (
+                <div key={i} className="aspect-square rounded-xl overflow-hidden bg-gray-100">
+                  <img src={d.image_url} alt={d.name} className="w-full h-full object-cover hover:scale-110 transition-transform duration-300" loading="lazy" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══════════ CONTACT ══════════ */}
+      <section id="contact" className="py-16 bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 italic">Contactez-nous</h2>
+          <p className="text-center text-gray-500 mt-2">Nous sommes à votre écoute</p>
+
+          <div className="grid md:grid-cols-3 gap-6 mt-10">
+            {restaurant.phone && (
+              <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+                <div className="w-14 h-14 rounded-full mx-auto flex items-center justify-center mb-4" style={{ backgroundColor: brandLight }}>
+                  <PhoneCall className="h-6 w-6" style={{ color: brand }} />
+                </div>
+                <h3 className="font-bold text-gray-900">Téléphone</h3>
+                <p className="text-sm text-gray-500 mt-1">{restaurant.phone}</p>
+                <a href={`tel:${restaurant.phone}`} className="inline-block mt-3 text-sm font-semibold px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+                  Appeler
+                </a>
+              </div>
+            )}
+
+            {whatsappNumber && (
+              <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+                <div className="w-14 h-14 rounded-full mx-auto flex items-center justify-center mb-4" style={{ backgroundColor: brandLight }}>
+                  <MessageCircle className="h-6 w-6" style={{ color: brand }} />
+                </div>
+                <h3 className="font-bold text-gray-900">WhatsApp</h3>
+                <p className="text-sm text-gray-500 mt-1">Messagerie instantanée</p>
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
+                  className="inline-block mt-3 text-sm font-semibold px-4 py-2 rounded-lg text-white transition-transform hover:scale-105"
+                  style={{ backgroundColor: brand }}>
+                  Envoyer un message
+                </a>
+              </div>
+            )}
+
+            {restaurant.address && (
+              <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+                <div className="w-14 h-14 rounded-full mx-auto flex items-center justify-center mb-4" style={{ backgroundColor: brandLight }}>
+                  <MapPin className="h-6 w-6" style={{ color: brand }} />
+                </div>
+                <h3 className="font-bold text-gray-900">Adresse</h3>
+                <p className="text-sm text-gray-500 mt-1">{restaurant.address}</p>
+                <a href={`https://maps.google.com/?q=${encodeURIComponent(restaurant.address)}`} target="_blank" rel="noopener noreferrer"
+                  className="inline-block mt-3 text-sm font-semibold px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+                  Voir sur la carte
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Social links */}
+          {(restaurant.social_facebook || restaurant.social_instagram) && (
+            <div className="text-center mt-10">
+              <h3 className="font-bold text-gray-900 mb-4">Suivez-nous</h3>
+              <div className="flex items-center justify-center gap-3">
+                {restaurant.social_facebook && (
+                  <a href={restaurant.social_facebook} target="_blank" rel="noopener noreferrer"
+                    className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:border-gray-400 transition-colors">
+                    <Facebook className="h-5 w-5" />
+                  </a>
+                )}
+                {restaurant.social_instagram && (
+                  <a href={restaurant.social_instagram} target="_blank" rel="noopener noreferrer"
+                    className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:border-gray-400 transition-colors">
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ══════════ FOOTER ══════════ */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                {restaurant.logo_url ? (
+                  <img src={restaurant.logo_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                ) : (
+                  <UtensilsCrossed className="w-6 h-6" style={{ color: brand }} />
+                )}
+                <span className="font-bold">{restaurant.name}</span>
+              </div>
+              {restaurant.slogan && <p className="text-sm text-gray-400">{restaurant.slogan}</p>}
+            </div>
+
+            {/* Quick links */}
+            <div>
+              <h4 className="font-bold mb-3">Liens Rapides</h4>
+              <div className="space-y-2">
+                {NAV_SECTIONS.slice(1).map(s => (
+                  <button key={s.id} onClick={() => scrollTo(s.id)} className="block text-sm text-gray-400 hover:text-white transition-colors">
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="font-bold mb-3">Contact</h4>
+              <div className="space-y-2 text-sm text-gray-400">
+                {restaurant.phone && (
+                  <div className="flex items-center gap-2"><Phone className="h-4 w-4" /> {restaurant.phone}</div>
+                )}
+                {restaurant.address && (
+                  <div className="flex items-center gap-2"><MapPin className="h-4 w-4" /> {restaurant.address}</div>
+                )}
+              </div>
+            </div>
+
+            {/* Social */}
+            <div>
+              <h4 className="font-bold mb-3">Suivez-nous</h4>
+              <div className="flex gap-3">
+                {restaurant.social_facebook && (
+                  <a href={restaurant.social_facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white transition-colors">
+                    <Facebook className="h-5 w-5" />
+                  </a>
+                )}
+                {restaurant.social_instagram && (
+                  <a href={restaurant.social_instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white transition-colors">
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 mt-8 pt-6 text-center">
+            <p className="text-sm text-gray-500">
+              © {new Date().getFullYear()} {restaurant.name}. Tous droits réservés. Propulsé par{" "}
+              <Link to="/" className="font-semibold hover:underline" style={{ color: brand }}>MenuUp</Link>
+            </p>
+          </div>
+        </div>
+      </footer>
+
+      {/* ══════════ STICKY WHATSAPP BAR ══════════ */}
       {whatsappNumber && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-t border-gray-200">
-          <div className="max-w-md mx-auto p-3">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-gray-200 shadow-lg">
+          <div className="max-w-5xl mx-auto p-3">
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
               <button
-                className="w-full py-4 rounded-2xl font-bold text-[15px] text-white flex items-center justify-center gap-2 transition-transform active:scale-[0.97]"
-                style={{
-                  backgroundColor: brand,
-                  boxShadow: `0 6px 24px ${brandMedium}`,
-                }}
+                className="w-full py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-transform active:scale-[0.97]"
+                style={{ backgroundColor: brand, boxShadow: `0 4px 20px ${brand}40` }}
               >
                 {selectedItems.length > 0 ? (
                   <>

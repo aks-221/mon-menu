@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, ToggleLeft, ToggleRight, Star, Loader2 } from "lucide-react";
+import { Plus, Trash2, ToggleLeft, ToggleRight, Star, Loader2, Upload, Image as ImageIcon } from "lucide-react";
 import { fetchCategories, fetchDishes, addDish, updateDish, deleteDishById } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const MenuManager = ({ restaurant }: { restaurant: any }) => {
@@ -11,16 +12,15 @@ const MenuManager = ({ restaurant }: { restaurant: any }) => {
   const [categories, setCategories] = useState<any[]>([]);
   const [activeCategory, setActiveCategory] = useState("Tous");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newDish, setNewDish] = useState({ name: "", description: "", price: "", category_id: "" });
+  const [newDish, setNewDish] = useState({ name: "", description: "", price: "", category_id: "", image_url: "" });
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const imageRef = useRef<HTMLInputElement>(null);
 
   const loadData = async () => {
     try {
-      const [cats, dsh] = await Promise.all([
-        fetchCategories(restaurant.id),
-        fetchDishes(restaurant.id),
-      ]);
+      const [cats, dsh] = await Promise.all([fetchCategories(restaurant.id), fetchDishes(restaurant.id)]);
       setCategories(cats);
       setDishes(dsh);
       if (cats.length > 0 && !newDish.category_id) {
@@ -35,9 +35,31 @@ const MenuManager = ({ restaurant }: { restaurant: any }) => {
 
   useEffect(() => { loadData(); }, [restaurant.id]);
 
-  const filtered = activeCategory === "Tous"
-    ? dishes
-    : dishes.filter((d) => d.category_id === activeCategory);
+  const filtered = activeCategory === "Tous" ? dishes : dishes.filter((d) => d.category_id === activeCategory);
+
+  const uploadImage = async (file: File) => {
+    const ext = file.name.split(".").pop();
+    const filePath = `dishes/${restaurant.id}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("restaurant-images").upload(filePath, file, { upsert: true });
+    if (error) throw error;
+    const { data } = supabase.storage.from("restaurant-images").getPublicUrl(filePath);
+    return data.publicUrl;
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    try {
+      const url = await uploadImage(file);
+      setNewDish(prev => ({ ...prev, image_url: url }));
+      toast.success("Image ajoutée !");
+    } catch {
+      toast.error("Erreur lors de l'upload");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const toggleAvailable = async (dish: any) => {
     await updateDish(dish.id, { is_available: !dish.is_available });
@@ -57,6 +79,7 @@ const MenuManager = ({ restaurant }: { restaurant: any }) => {
 
   const handleAdd = async () => {
     if (!newDish.name || !newDish.price) return toast.error("Nom et prix requis");
+    if (!newDish.image_url) return toast.error("L'image du plat est obligatoire !");
     setAdding(true);
     try {
       const dish = await addDish({
@@ -66,9 +89,10 @@ const MenuManager = ({ restaurant }: { restaurant: any }) => {
         description: newDish.description,
         price: parseInt(newDish.price),
         tags: [],
+        image_url: newDish.image_url,
       });
       setDishes([...dishes, dish]);
-      setNewDish({ name: "", description: "", price: "", category_id: categories[0]?.id || "" });
+      setNewDish({ name: "", description: "", price: "", category_id: categories[0]?.id || "", image_url: "" });
       setShowAddForm(false);
       toast.success("Plat ajouté !");
     } catch {
@@ -95,6 +119,28 @@ const MenuManager = ({ restaurant }: { restaurant: any }) => {
       {showAddForm && (
         <div className="bg-card rounded-2xl border border-border p-5 space-y-4">
           <h3 className="font-bold">Nouveau plat</h3>
+
+          {/* Image upload — required */}
+          <div className="space-y-2">
+            <Label>Image du plat <span className="text-destructive">*</span></Label>
+            <input type="file" accept="image/*" ref={imageRef} onChange={handleImageUpload} className="hidden" />
+            <div
+              onClick={() => imageRef.current?.click()}
+              className="w-full h-36 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 transition-colors overflow-hidden"
+            >
+              {uploadingImage ? (
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              ) : newDish.image_url ? (
+                <img src={newDish.image_url} alt="Plat" className="w-full h-full object-cover" />
+              ) : (
+                <>
+                  <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Cliquez pour ajouter une image (obligatoire)</span>
+                </>
+              )}
+            </div>
+          </div>
+
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Nom</Label>
@@ -152,7 +198,13 @@ const MenuManager = ({ restaurant }: { restaurant: any }) => {
           {filtered.map((dish) => (
             <div key={dish.id}
               className={`bg-card rounded-2xl border border-border p-4 flex items-center gap-4 transition-opacity ${!dish.is_available ? "opacity-50" : ""}`}>
-              <div className="w-14 h-14 rounded-xl bg-primary/10 flex-shrink-0 flex items-center justify-center text-2xl">🍽️</div>
+              <div className="w-14 h-14 rounded-xl bg-primary/10 flex-shrink-0 overflow-hidden">
+                {dish.image_url ? (
+                  <img src={dish.image_url} alt={dish.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-2xl">🍽️</div>
+                )}
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="font-bold text-sm truncate">{dish.name}</h3>
