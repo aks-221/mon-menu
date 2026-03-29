@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, UtensilsCrossed, Clock, BarChart3,
-  QrCode, LogOut, Menu, X, Store, Eye, Loader2
+  QrCode, LogOut, Menu, X, Store, Eye, Loader2, Package, Truck, CalendarDays
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,13 +13,18 @@ import RestaurantProfile from "@/components/dashboard/RestaurantProfile";
 import HoursManager from "@/components/dashboard/HoursManager";
 import StatsView from "@/components/dashboard/StatsView";
 import QrCodeView from "@/components/dashboard/QrCodeView";
+import OrdersManager from "@/components/dashboard/OrdersManager";
+import DeliveryZonesManager from "@/components/dashboard/DeliveryZonesManager";
+import ReservationsManager from "@/components/dashboard/ReservationsManager";
 
 const navItems = [
   { id: "home", label: "Aperçu", icon: LayoutDashboard },
-  { id: "profile", label: "Profil", icon: Store },
+  { id: "orders", label: "Commandes", icon: Package },
   { id: "menu", label: "Menu", icon: UtensilsCrossed },
+  { id: "delivery", label: "Livraison", icon: Truck },
+  { id: "reservations", label: "Réservations", icon: CalendarDays },
+  { id: "profile", label: "Profil", icon: Store },
   { id: "hours", label: "Horaires", icon: Clock },
-  { id: "stats", label: "Statistiques", icon: BarChart3 },
   { id: "qrcode", label: "QR Code", icon: QrCode },
 ];
 
@@ -74,10 +79,12 @@ const Dashboard = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "home": return <DashboardHome restaurant={restaurant} onNavigate={setActiveTab} />;
-      case "profile": return <RestaurantProfile restaurant={restaurant} onUpdate={setRestaurant} />;
+      case "orders": return <OrdersManager restaurant={restaurant} />;
       case "menu": return <MenuManager restaurant={restaurant} />;
+      case "delivery": return <DeliveryZonesManager restaurant={restaurant} onUpdate={setRestaurant} />;
+      case "reservations": return <ReservationsManager restaurant={restaurant} />;
+      case "profile": return <RestaurantProfile restaurant={restaurant} onUpdate={setRestaurant} />;
       case "hours": return <HoursManager restaurant={restaurant} />;
-      case "stats": return <StatsView />;
       case "qrcode": return <QrCodeView restaurant={restaurant} />;
       default: return <DashboardHome restaurant={restaurant} onNavigate={setActiveTab} />;
     }

@@ -4,9 +4,12 @@ import {
   MapPin, Clock, Phone, MessageCircle, Star, Loader2,
   Instagram, Facebook, ShoppingBag, Plus, Minus, ChefHat,
   Heart, Award, Mail, ChevronDown, Menu as MenuIcon, X,
-  UtensilsCrossed, MapPinned, CalendarClock, MessageSquare, PhoneCall
+  UtensilsCrossed, MapPinned, CalendarClock, MessageSquare, PhoneCall,
+  CalendarDays
 } from "lucide-react";
 import { fetchRestaurantBySlug, fetchCategories, fetchDishes, fetchBusinessHours } from "@/lib/api";
+import CheckoutModal from "@/components/checkout/CheckoutModal";
+import ReservationModal from "@/components/checkout/ReservationModal";
 
 const DAY_NAMES = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
 
@@ -30,7 +33,8 @@ const RestaurantPublic = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [showReservation, setShowReservation] = useState(false);
   useEffect(() => {
     const load = async () => {
       try {
@@ -621,30 +625,56 @@ const RestaurantPublic = () => {
         </div>
       </footer>
 
-      {/* ══════════ STICKY WHATSAPP BAR ══════════ */}
-      {whatsappNumber && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-gray-200 shadow-lg">
-          <div className="max-w-5xl mx-auto p-3">
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-              <button
-                className="w-full py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-transform active:scale-[0.97]"
-                style={{ backgroundColor: brand, boxShadow: `0 4px 20px ${brand}40` }}
-              >
-                {selectedItems.length > 0 ? (
-                  <>
-                    <ShoppingBag className="h-5 w-5" />
-                    Commander {totalItems} article{totalItems > 1 ? "s" : ""} · {totalPrice.toLocaleString()} FCFA
-                  </>
-                ) : (
-                  <>
-                    <MessageCircle className="h-5 w-5" />
-                    Commander sur WhatsApp
-                  </>
-                )}
-              </button>
-            </a>
-          </div>
+      {/* ══════════ STICKY ORDER BAR ══════════ */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-gray-200 shadow-lg">
+        <div className="max-w-5xl mx-auto p-3 flex gap-2">
+          {/* Reservation button */}
+          <button
+            onClick={() => setShowReservation(true)}
+            className="flex items-center justify-center gap-1 px-4 py-3.5 rounded-xl font-bold text-sm border-2 transition-transform active:scale-[0.97]"
+            style={{ borderColor: brand, color: brand }}
+          >
+            <CalendarDays className="h-4 w-4" />
+            <span className="hidden sm:inline">Réserver</span>
+          </button>
+
+          {/* Order button */}
+          <button
+            onClick={() => selectedItems.length > 0 ? setShowCheckout(true) : undefined}
+            className="flex-1 py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-transform active:scale-[0.97] disabled:opacity-60"
+            style={{ backgroundColor: brand, boxShadow: `0 4px 20px ${brand}40` }}
+            disabled={selectedItems.length === 0}
+          >
+            {selectedItems.length > 0 ? (
+              <>
+                <ShoppingBag className="h-5 w-5" />
+                Commander {totalItems} article{totalItems > 1 ? "s" : ""} · {totalPrice.toLocaleString()} FCFA
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="h-5 w-5" />
+                Sélectionnez des plats
+              </>
+            )}
+          </button>
         </div>
+      </div>
+
+      {/* ══════════ MODALS ══════════ */}
+      {showCheckout && (
+        <CheckoutModal
+          restaurant={restaurant}
+          items={selectedItems}
+          onClose={() => { setShowCheckout(false); setSelectedItems([]); }}
+          brand={brand}
+        />
+      )}
+      {showReservation && (
+        <ReservationModal
+          restaurant={restaurant}
+          onClose={() => setShowReservation(false)}
+          brand={brand}
+        />
       )}
     </div>
   );

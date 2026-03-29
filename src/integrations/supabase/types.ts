@@ -81,6 +81,44 @@ export type Database = {
           },
         ]
       }
+      delivery_zones: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          neighborhoods: string
+          price: number
+          restaurant_id: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          neighborhoods?: string
+          price?: number
+          restaurant_id: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          neighborhoods?: string
+          price?: number
+          restaurant_id?: string
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_zones_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dishes: {
         Row: {
           category_id: string | null
@@ -144,12 +182,174 @@ export type Database = {
           },
         ]
       }
+      order_items: {
+        Row: {
+          dish_id: string | null
+          dish_name: string
+          id: string
+          order_id: string
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          dish_id?: string | null
+          dish_name: string
+          id?: string
+          order_id: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Update: {
+          dish_id?: string | null
+          dish_name?: string
+          id?: string
+          order_id?: string
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_dish_id_fkey"
+            columns: ["dish_id"]
+            isOneToOne: false
+            referencedRelation: "dishes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          delivery_address: string | null
+          delivery_fee: number
+          delivery_zone_id: string | null
+          id: string
+          notes: string | null
+          order_type: string
+          payment_method: string
+          restaurant_id: string
+          status: string
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_name: string
+          customer_phone: string
+          delivery_address?: string | null
+          delivery_fee?: number
+          delivery_zone_id?: string | null
+          id?: string
+          notes?: string | null
+          order_type?: string
+          payment_method?: string
+          restaurant_id: string
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          delivery_address?: string | null
+          delivery_fee?: number
+          delivery_zone_id?: string | null
+          id?: string
+          notes?: string | null
+          order_type?: string
+          payment_method?: string
+          restaurant_id?: string
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_delivery_zone_id_fkey"
+            columns: ["delivery_zone_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_zones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reservations: {
+        Row: {
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          id: string
+          notes: string | null
+          party_size: number
+          reservation_date: string
+          reservation_time: string
+          restaurant_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          customer_name: string
+          customer_phone: string
+          id?: string
+          notes?: string | null
+          party_size?: number
+          reservation_date: string
+          reservation_time: string
+          restaurant_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          notes?: string | null
+          party_size?: number
+          reservation_date?: string
+          reservation_time?: string
+          restaurant_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       restaurants: {
         Row: {
           address: string | null
           cover_url: string | null
           created_at: string
           cuisine_type: string | null
+          delivery_enabled: boolean | null
           description: string | null
           id: string
           is_published: boolean | null
@@ -171,6 +371,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           cuisine_type?: string | null
+          delivery_enabled?: boolean | null
           description?: string | null
           id?: string
           is_published?: boolean | null
@@ -192,6 +393,7 @@ export type Database = {
           cover_url?: string | null
           created_at?: string
           cuisine_type?: string | null
+          delivery_enabled?: boolean | null
           description?: string | null
           id?: string
           is_published?: boolean | null
