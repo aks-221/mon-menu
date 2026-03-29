@@ -1,10 +1,10 @@
-import { UtensilsCrossed, Eye, TrendingUp, MessageCircle } from "lucide-react";
+import { UtensilsCrossed, Eye, TrendingUp, MessageCircle, Package, Truck, CalendarDays } from "lucide-react";
 
 const DashboardHome = ({ restaurant, onNavigate }: { restaurant: any; onNavigate: (tab: string) => void }) => {
   const stats = [
-    { label: "Vues ce mois", value: "—", icon: Eye, change: "" },
     { label: "Restaurant", value: restaurant.name, icon: UtensilsCrossed, change: "" },
     { label: "Statut", value: restaurant.is_published ? "En ligne" : "Hors ligne", icon: TrendingUp, change: "" },
+    { label: "Livraison", value: restaurant.delivery_enabled ? "Activée" : "Désactivée", icon: Truck, change: "" },
     { label: "WhatsApp", value: restaurant.whatsapp || "Non configuré", icon: MessageCircle, change: "" },
   ];
 
@@ -29,18 +29,24 @@ const DashboardHome = ({ restaurant, onNavigate }: { restaurant: any; onNavigate
         ))}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-3 gap-4">
+        <button onClick={() => onNavigate("orders")}
+          className="bg-card rounded-2xl p-6 border border-border shadow-card text-left hover:shadow-warm transition-shadow">
+          <Package className="h-8 w-8 text-primary mb-3" />
+          <h3 className="font-bold mb-1">Commandes</h3>
+          <p className="text-sm text-muted-foreground">Voir et gérer vos commandes clients.</p>
+        </button>
         <button onClick={() => onNavigate("menu")}
           className="bg-card rounded-2xl p-6 border border-border shadow-card text-left hover:shadow-warm transition-shadow">
           <UtensilsCrossed className="h-8 w-8 text-primary mb-3" />
-          <h3 className="font-bold mb-1">Gérer votre menu</h3>
+          <h3 className="font-bold mb-1">Gérer le menu</h3>
           <p className="text-sm text-muted-foreground">Ajoutez, modifiez ou désactivez vos plats.</p>
         </button>
-        <button onClick={() => onNavigate("profile")}
+        <button onClick={() => onNavigate("reservations")}
           className="bg-card rounded-2xl p-6 border border-border shadow-card text-left hover:shadow-warm transition-shadow">
-          <MessageCircle className="h-8 w-8 text-accent mb-3" />
-          <h3 className="font-bold mb-1">Configurer WhatsApp</h3>
-          <p className="text-sm text-muted-foreground">Vérifiez votre numéro et personnalisez le message.</p>
+          <CalendarDays className="h-8 w-8 text-accent mb-3" />
+          <h3 className="font-bold mb-1">Réservations</h3>
+          <p className="text-sm text-muted-foreground">Gérez les réservations de tables.</p>
         </button>
       </div>
 
