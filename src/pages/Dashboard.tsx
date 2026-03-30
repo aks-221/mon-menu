@@ -116,6 +116,7 @@ const Dashboard = () => {
       case "menu": return <MenuManager restaurant={restaurant} />;
       case "delivery": return <DeliveryZonesManager restaurant={restaurant} onUpdate={setRestaurant} />;
       case "reservations": return <ReservationsManager restaurant={restaurant} />;
+      case "stats": return <StatsView restaurant={restaurant} />;
       case "profile": return <RestaurantProfile restaurant={restaurant} onUpdate={setRestaurant} />;
       case "hours": return <HoursManager restaurant={restaurant} />;
       case "qrcode": return <QrCodeView restaurant={restaurant} />;
