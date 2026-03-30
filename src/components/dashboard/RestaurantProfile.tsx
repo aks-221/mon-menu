@@ -184,6 +184,15 @@ const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate
           </div>
         </div>
 
+        {/* Reservation toggle */}
+        <div className="flex items-center justify-between p-4 rounded-xl border border-border">
+          <div>
+            <Label className="font-semibold">Réservations de tables</Label>
+            <p className="text-xs text-muted-foreground mt-0.5">Permettre aux clients de réserver une table en ligne</p>
+          </div>
+          <Switch checked={profile.reservation_enabled} onCheckedChange={(v) => setProfile({ ...profile, reservation_enabled: v })} />
+        </div>
+
         <Button onClick={handleSave} disabled={saving} className="gradient-primary text-primary-foreground shadow-warm rounded-xl">
           {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
           Sauvegarder
