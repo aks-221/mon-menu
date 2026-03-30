@@ -48,6 +48,35 @@ const Dashboard = () => {
       fetchUserRestaurant(user.id).then((r) => {
         setRestaurant(r);
         setLoading(false);
+        if (r) {
+          // Fetch counts
+          supabase.from("orders").select("id", { count: "exact", head: true })
+            .eq("restaurant_id", r.id).eq("status", "en_attente")
+            .then(({ count }) => setOrderCount(count || 0));
+          supabase.from("reservations").select("id", { count: "exact", head: true })
+            .eq("restaurant_id", r.id).eq("status", "en_attente")
+            .then(({ count }) => setReservationCount(count || 0));
+
+          // Realtime subscriptions for counts
+          const ordersChannel = supabase.channel("orders-count")
+            .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${r.id}` }, () => {
+              supabase.from("orders").select("id", { count: "exact", head: true })
+                .eq("restaurant_id", r.id).eq("status", "en_attente")
+                .then(({ count }) => setOrderCount(count || 0));
+            }).subscribe();
+
+          const reservationsChannel = supabase.channel("reservations-count")
+            .on("postgres_changes", { event: "*", schema: "public", table: "reservations", filter: `restaurant_id=eq.${r.id}` }, () => {
+              supabase.from("reservations").select("id", { count: "exact", head: true })
+                .eq("restaurant_id", r.id).eq("status", "en_attente")
+                .then(({ count }) => setReservationCount(count || 0));
+            }).subscribe();
+
+          return () => {
+            supabase.removeChannel(ordersChannel);
+            supabase.removeChannel(reservationsChannel);
+          };
+        }
       }).catch(() => setLoading(false));
     }
   }, [user, authLoading, navigate]);
