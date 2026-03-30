@@ -163,18 +163,28 @@ const Dashboard = () => {
   );
 };
 
-const SidebarNav = ({ items, active, onSelect }: {
+const SidebarNav = ({ items, active, onSelect, badges }: {
   items: typeof navItems; active: string; onSelect: (id: string) => void;
+  badges: Record<string, number>;
 }) => (
   <nav className="space-y-1 flex-1">
-    {items.map((item) => (
-      <button key={item.id} onClick={() => onSelect(item.id)}
-        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-          active === item.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-        }`}>
-        <item.icon className="h-4 w-4" />{item.label}
-      </button>
-    ))}
+    {items.map((item) => {
+      const count = badges[item.id] || 0;
+      return (
+        <button key={item.id} onClick={() => onSelect(item.id)}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            active === item.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+          }`}>
+          <item.icon className="h-4 w-4" />
+          <span className="flex-1 text-left">{item.label}</span>
+          {count > 0 && (
+            <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center">
+              {count}
+            </span>
+          )}
+        </button>
+      );
+    })}
   </nav>
 );
 
