@@ -7,6 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchUserRestaurant } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 import DashboardHome from "@/components/dashboard/DashboardHome";
 import MenuManager from "@/components/dashboard/MenuManager";
 import RestaurantProfile from "@/components/dashboard/RestaurantProfile";
@@ -33,6 +34,8 @@ const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [restaurant, setRestaurant] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [orderCount, setOrderCount] = useState(0);
+  const [reservationCount, setReservationCount] = useState(0);
   const { user, signOut, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
