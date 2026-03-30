@@ -147,7 +147,7 @@ const Dashboard = () => {
           <Link to="/" className="font-extrabold text-lg">Menu<span className="text-primary">Up</span></Link>
           <p className="text-xs text-muted-foreground mt-1">{restaurant.name}</p>
         </div>
-        <SidebarNav items={navItems} active={activeTab} onSelect={setActiveTab} />
+        <SidebarNav items={navItems} active={activeTab} onSelect={setActiveTab} badges={{ orders: orderCount, reservations: reservationCount }} />
         <div className="mt-auto space-y-2">
           <Link to={`/restaurant/${restaurant.slug}`}>
             <Button variant="outline" size="sm" className="w-full justify-start gap-2"><Eye className="h-4 w-4" /> Voir ma page</Button>
