@@ -137,7 +137,7 @@ const Dashboard = () => {
               <span className="font-extrabold text-lg">Menu<span className="text-primary">Up</span></span>
               <button onClick={() => setSidebarOpen(false)}><X className="h-5 w-5" /></button>
             </div>
-            <SidebarNav items={navItems} active={activeTab} onSelect={(id) => { setActiveTab(id); setSidebarOpen(false); }} />
+            <SidebarNav items={navItems} active={activeTab} onSelect={(id) => { setActiveTab(id); setSidebarOpen(false); }} badges={{ orders: orderCount, reservations: reservationCount }} />
           </div>
         </div>
       )}
