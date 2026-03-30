@@ -1,6 +1,20 @@
+import { useState, useEffect } from "react";
 import { UtensilsCrossed, Eye, TrendingUp, MessageCircle, Package, Truck, CalendarDays } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const DashboardHome = ({ restaurant, onNavigate }: { restaurant: any; onNavigate: (tab: string) => void }) => {
+  const [orderCount, setOrderCount] = useState(0);
+  const [reservationCount, setReservationCount] = useState(0);
+
+  useEffect(() => {
+    supabase.from("orders").select("id", { count: "exact", head: true })
+      .eq("restaurant_id", restaurant.id).eq("status", "en_attente")
+      .then(({ count }) => setOrderCount(count || 0));
+    supabase.from("reservations").select("id", { count: "exact", head: true })
+      .eq("restaurant_id", restaurant.id).eq("status", "en_attente")
+      .then(({ count }) => setReservationCount(count || 0));
+  }, [restaurant.id]);
+
   const stats = [
     { label: "Restaurant", value: restaurant.name, icon: UtensilsCrossed, change: "" },
     { label: "Statut", value: restaurant.is_published ? "En ligne" : "Hors ligne", icon: TrendingUp, change: "" },
@@ -31,10 +45,15 @@ const DashboardHome = ({ restaurant, onNavigate }: { restaurant: any; onNavigate
 
       <div className="grid md:grid-cols-3 gap-4">
         <button onClick={() => onNavigate("orders")}
-          className="bg-card rounded-2xl p-6 border border-border shadow-card text-left hover:shadow-warm transition-shadow">
+          className="bg-card rounded-2xl p-6 border border-border shadow-card text-left hover:shadow-warm transition-shadow relative">
           <Package className="h-8 w-8 text-primary mb-3" />
           <h3 className="font-bold mb-1">Commandes</h3>
           <p className="text-sm text-muted-foreground">Voir et gérer vos commandes clients.</p>
+          {orderCount > 0 && (
+            <span className="absolute top-4 right-4 min-w-[24px] h-6 px-2 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center">
+              {orderCount}
+            </span>
+          )}
         </button>
         <button onClick={() => onNavigate("menu")}
           className="bg-card rounded-2xl p-6 border border-border shadow-card text-left hover:shadow-warm transition-shadow">
@@ -43,10 +62,15 @@ const DashboardHome = ({ restaurant, onNavigate }: { restaurant: any; onNavigate
           <p className="text-sm text-muted-foreground">Ajoutez, modifiez ou désactivez vos plats.</p>
         </button>
         <button onClick={() => onNavigate("reservations")}
-          className="bg-card rounded-2xl p-6 border border-border shadow-card text-left hover:shadow-warm transition-shadow">
+          className="bg-card rounded-2xl p-6 border border-border shadow-card text-left hover:shadow-warm transition-shadow relative">
           <CalendarDays className="h-8 w-8 text-accent mb-3" />
           <h3 className="font-bold mb-1">Réservations</h3>
           <p className="text-sm text-muted-foreground">Gérez les réservations de tables.</p>
+          {reservationCount > 0 && (
+            <span className="absolute top-4 right-4 min-w-[24px] h-6 px-2 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center">
+              {reservationCount}
+            </span>
+          )}
         </button>
       </div>
 

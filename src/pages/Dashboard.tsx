@@ -7,6 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchUserRestaurant } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 import DashboardHome from "@/components/dashboard/DashboardHome";
 import MenuManager from "@/components/dashboard/MenuManager";
 import RestaurantProfile from "@/components/dashboard/RestaurantProfile";
@@ -33,6 +34,8 @@ const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [restaurant, setRestaurant] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [orderCount, setOrderCount] = useState(0);
+  const [reservationCount, setReservationCount] = useState(0);
   const { user, signOut, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -45,6 +48,35 @@ const Dashboard = () => {
       fetchUserRestaurant(user.id).then((r) => {
         setRestaurant(r);
         setLoading(false);
+        if (r) {
+          // Fetch counts
+          supabase.from("orders").select("id", { count: "exact", head: true })
+            .eq("restaurant_id", r.id).eq("status", "en_attente")
+            .then(({ count }) => setOrderCount(count || 0));
+          supabase.from("reservations").select("id", { count: "exact", head: true })
+            .eq("restaurant_id", r.id).eq("status", "en_attente")
+            .then(({ count }) => setReservationCount(count || 0));
+
+          // Realtime subscriptions for counts
+          const ordersChannel = supabase.channel("orders-count")
+            .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${r.id}` }, () => {
+              supabase.from("orders").select("id", { count: "exact", head: true })
+                .eq("restaurant_id", r.id).eq("status", "en_attente")
+                .then(({ count }) => setOrderCount(count || 0));
+            }).subscribe();
+
+          const reservationsChannel = supabase.channel("reservations-count")
+            .on("postgres_changes", { event: "*", schema: "public", table: "reservations", filter: `restaurant_id=eq.${r.id}` }, () => {
+              supabase.from("reservations").select("id", { count: "exact", head: true })
+                .eq("restaurant_id", r.id).eq("status", "en_attente")
+                .then(({ count }) => setReservationCount(count || 0));
+            }).subscribe();
+
+          return () => {
+            supabase.removeChannel(ordersChannel);
+            supabase.removeChannel(reservationsChannel);
+          };
+        }
       }).catch(() => setLoading(false));
     }
   }, [user, authLoading, navigate]);
@@ -105,7 +137,7 @@ const Dashboard = () => {
               <span className="font-extrabold text-lg">Menu<span className="text-primary">Up</span></span>
               <button onClick={() => setSidebarOpen(false)}><X className="h-5 w-5" /></button>
             </div>
-            <SidebarNav items={navItems} active={activeTab} onSelect={(id) => { setActiveTab(id); setSidebarOpen(false); }} />
+            <SidebarNav items={navItems} active={activeTab} onSelect={(id) => { setActiveTab(id); setSidebarOpen(false); }} badges={{ orders: orderCount, reservations: reservationCount }} />
           </div>
         </div>
       )}
@@ -115,7 +147,7 @@ const Dashboard = () => {
           <Link to="/" className="font-extrabold text-lg">Menu<span className="text-primary">Up</span></Link>
           <p className="text-xs text-muted-foreground mt-1">{restaurant.name}</p>
         </div>
-        <SidebarNav items={navItems} active={activeTab} onSelect={setActiveTab} />
+        <SidebarNav items={navItems} active={activeTab} onSelect={setActiveTab} badges={{ orders: orderCount, reservations: reservationCount }} />
         <div className="mt-auto space-y-2">
           <Link to={`/restaurant/${restaurant.slug}`}>
             <Button variant="outline" size="sm" className="w-full justify-start gap-2"><Eye className="h-4 w-4" /> Voir ma page</Button>
@@ -131,18 +163,28 @@ const Dashboard = () => {
   );
 };
 
-const SidebarNav = ({ items, active, onSelect }: {
+const SidebarNav = ({ items, active, onSelect, badges }: {
   items: typeof navItems; active: string; onSelect: (id: string) => void;
+  badges: Record<string, number>;
 }) => (
   <nav className="space-y-1 flex-1">
-    {items.map((item) => (
-      <button key={item.id} onClick={() => onSelect(item.id)}
-        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-          active === item.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-        }`}>
-        <item.icon className="h-4 w-4" />{item.label}
-      </button>
-    ))}
+    {items.map((item) => {
+      const count = badges[item.id] || 0;
+      return (
+        <button key={item.id} onClick={() => onSelect(item.id)}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            active === item.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+          }`}>
+          <item.icon className="h-4 w-4" />
+          <span className="flex-1 text-left">{item.label}</span>
+          {count > 0 && (
+            <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center">
+              {count}
+            </span>
+          )}
+        </button>
+      );
+    })}
   </nav>
 );
 

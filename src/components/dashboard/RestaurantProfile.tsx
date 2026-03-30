@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Save, Loader2, Upload, Image as ImageIcon } from "lucide-react";
 import { updateRestaurant } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,7 @@ const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate
     social_instagram: restaurant.social_instagram || "",
     logo_url: restaurant.logo_url || "",
     cover_url: restaurant.cover_url || "",
+    reservation_enabled: restaurant.reservation_enabled || false,
   });
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -180,6 +182,15 @@ const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate
             <input type="color" value={profile.primary_color} onChange={(e) => setProfile({ ...profile, primary_color: e.target.value })} className="w-10 h-10 rounded-lg border border-border cursor-pointer" />
             <span className="text-sm text-muted-foreground">{profile.primary_color}</span>
           </div>
+        </div>
+
+        {/* Reservation toggle */}
+        <div className="flex items-center justify-between p-4 rounded-xl border border-border">
+          <div>
+            <Label className="font-semibold">Réservations de tables</Label>
+            <p className="text-xs text-muted-foreground mt-0.5">Permettre aux clients de réserver une table en ligne</p>
+          </div>
+          <Switch checked={profile.reservation_enabled} onCheckedChange={(v) => setProfile({ ...profile, reservation_enabled: v })} />
         </div>
 
         <Button onClick={handleSave} disabled={saving} className="gradient-primary text-primary-foreground shadow-warm rounded-xl">

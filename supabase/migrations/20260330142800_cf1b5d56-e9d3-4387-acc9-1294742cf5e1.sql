@@ -1,0 +1,1 @@
+ALTER TABLE public.restaurants ADD COLUMN reservation_enabled boolean DEFAULT false;

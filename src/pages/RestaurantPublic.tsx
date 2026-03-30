@@ -628,15 +628,17 @@ const RestaurantPublic = () => {
       {/* ══════════ STICKY ORDER BAR ══════════ */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-gray-200 shadow-lg">
         <div className="max-w-5xl mx-auto p-3 flex gap-2">
-          {/* Reservation button */}
-          <button
-            onClick={() => setShowReservation(true)}
-            className="flex items-center justify-center gap-1 px-4 py-3.5 rounded-xl font-bold text-sm border-2 transition-transform active:scale-[0.97]"
-            style={{ borderColor: brand, color: brand }}
-          >
-            <CalendarDays className="h-4 w-4" />
-            <span className="hidden sm:inline">Réserver</span>
-          </button>
+          {/* Reservation button — only if enabled */}
+          {restaurant.reservation_enabled && (
+            <button
+              onClick={() => setShowReservation(true)}
+              className="flex items-center justify-center gap-1 px-4 py-3.5 rounded-xl font-bold text-sm border-2 transition-transform active:scale-[0.97]"
+              style={{ borderColor: brand, color: brand }}
+            >
+              <CalendarDays className="h-4 w-4" />
+              <span className="hidden sm:inline">Réserver</span>
+            </button>
+          )}
 
           {/* Order button */}
           <button
