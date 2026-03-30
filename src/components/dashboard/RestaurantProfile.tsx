@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Save, Loader2, Upload, Image as ImageIcon } from "lucide-react";
 import { updateRestaurant } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
