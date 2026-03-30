@@ -1,6 +1,20 @@
+import { useState, useEffect } from "react";
 import { UtensilsCrossed, Eye, TrendingUp, MessageCircle, Package, Truck, CalendarDays } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const DashboardHome = ({ restaurant, onNavigate }: { restaurant: any; onNavigate: (tab: string) => void }) => {
+  const [orderCount, setOrderCount] = useState(0);
+  const [reservationCount, setReservationCount] = useState(0);
+
+  useEffect(() => {
+    supabase.from("orders").select("id", { count: "exact", head: true })
+      .eq("restaurant_id", restaurant.id).eq("status", "en_attente")
+      .then(({ count }) => setOrderCount(count || 0));
+    supabase.from("reservations").select("id", { count: "exact", head: true })
+      .eq("restaurant_id", restaurant.id).eq("status", "en_attente")
+      .then(({ count }) => setReservationCount(count || 0));
+  }, [restaurant.id]);
+
   const stats = [
     { label: "Restaurant", value: restaurant.name, icon: UtensilsCrossed, change: "" },
     { label: "Statut", value: restaurant.is_published ? "En ligne" : "Hors ligne", icon: TrendingUp, change: "" },
