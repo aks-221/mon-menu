@@ -24,6 +24,7 @@ const navItems = [
   { id: "menu", label: "Menu", icon: UtensilsCrossed },
   { id: "delivery", label: "Livraison", icon: Truck },
   { id: "reservations", label: "Réservations", icon: CalendarDays },
+  { id: "stats", label: "Statistiques", icon: BarChart3 },
   { id: "profile", label: "Profil", icon: Store },
   { id: "hours", label: "Horaires", icon: Clock },
   { id: "qrcode", label: "QR Code", icon: QrCode },
