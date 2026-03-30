@@ -23,6 +23,7 @@ const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate
     social_instagram: restaurant.social_instagram || "",
     logo_url: restaurant.logo_url || "",
     cover_url: restaurant.cover_url || "",
+    reservation_enabled: restaurant.reservation_enabled || false,
   });
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
