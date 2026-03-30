@@ -357,6 +357,7 @@ export type Database = {
           name: string
           phone: string | null
           primary_color: string | null
+          reservation_enabled: boolean | null
           slogan: string | null
           slug: string
           social_facebook: string | null
@@ -379,6 +380,7 @@ export type Database = {
           name: string
           phone?: string | null
           primary_color?: string | null
+          reservation_enabled?: boolean | null
           slogan?: string | null
           slug: string
           social_facebook?: string | null
@@ -401,6 +403,7 @@ export type Database = {
           name?: string
           phone?: string | null
           primary_color?: string | null
+          reservation_enabled?: boolean | null
           slogan?: string | null
           slug?: string
           social_facebook?: string | null
