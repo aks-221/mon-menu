@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Package, Phone, MapPin, Clock, ChevronDown, User, Truck, ShoppingBag } from "lucide-react";
+import { Loader2, Package, Phone, MapPin, Clock, ChevronDown, User, Truck, ShoppingBag, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { generateReceipt } from "@/lib/generateReceipt";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   en_attente: { label: "En attente", color: "bg-yellow-100 text-yellow-800" },
