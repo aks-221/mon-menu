@@ -187,21 +187,45 @@ const OrdersManager = ({ restaurant }: { restaurant: any }) => {
                     </div>
                   </div>
 
-                  {/* Status actions */}
-                  {order.status !== "livree" && order.status !== "annulee" && (
-                    <div className="flex flex-wrap gap-2">
-                      {STATUS_FLOW.filter(s => STATUS_FLOW.indexOf(s) > STATUS_FLOW.indexOf(order.status)).map(s => (
-                        <Button key={s} size="sm" variant="outline" className="rounded-xl text-xs"
-                          onClick={() => updateStatus(order.id, s)}>
-                          {STATUS_CONFIG[s]?.label}
+                  {/* Actions */}
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" variant="outline" className="rounded-xl text-xs gap-1"
+                      onClick={() => {
+                        const items = orderItems[order.id] || [];
+                        generateReceipt({
+                          restaurantName: restaurant.name,
+                          restaurantPhone: restaurant.phone,
+                          restaurantAddress: restaurant.address,
+                          orderId: order.id,
+                          customerName: order.customer_name,
+                          customerPhone: order.customer_phone,
+                          orderType: order.order_type,
+                          deliveryAddress: order.delivery_address,
+                          items,
+                          subtotal: order.subtotal,
+                          deliveryFee: order.delivery_fee,
+                          total: order.total,
+                          paymentMethod: order.payment_method,
+                          createdAt: order.created_at,
+                        });
+                      }}>
+                      <Printer className="h-3.5 w-3.5" /> Imprimer reçu
+                    </Button>
+                    {order.status !== "livree" && order.status !== "annulee" && (
+                      <>
+                        {STATUS_FLOW.filter(s => STATUS_FLOW.indexOf(s) > STATUS_FLOW.indexOf(order.status)).map(s => (
+                          <Button key={s} size="sm" variant="outline" className="rounded-xl text-xs"
+                            onClick={() => updateStatus(order.id, s)}>
+                            {STATUS_CONFIG[s]?.label}
+                          </Button>
+                        ))}
+                        <Button size="sm" variant="outline" className="rounded-xl text-xs text-destructive border-destructive/30"
+                          onClick={() => updateStatus(order.id, "annulee")}>
+                          Annuler
                         </Button>
-                      ))}
-                      <Button size="sm" variant="outline" className="rounded-xl text-xs text-destructive border-destructive/30"
-                        onClick={() => updateStatus(order.id, "annulee")}>
-                        Annuler
-                      </Button>
-                    </div>
-                  )}
+                      </>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
