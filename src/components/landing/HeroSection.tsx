@@ -55,15 +55,18 @@ const HeroSection = () => {
               <div className="w-full h-full bg-white rounded-[2.2rem] overflow-hidden flex flex-col">
                 
                 {/* Hero image area */}
-                <div className="relative h-[180px] bg-gradient-to-br from-gray-800 to-gray-950 overflow-hidden">
-                  <div className="absolute inset-0 bg-black/40" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-3">
-                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-2 border border-white/30">
-                      <span className="text-xl">🍽️</span>
+                <div className="relative h-[160px] overflow-hidden">
+                  <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&h=400&fit=crop" alt="" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3 flex items-end gap-2">
+                    <div className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center overflow-hidden border-2 border-white">
+                      <span className="text-base">🍽️</span>
                     </div>
-                    <p className="text-white font-bold text-sm italic">Chez Fatou</p>
-                    <p className="text-gray-300 text-[10px] mt-0.5">Restaurant Sénégalais</p>
-                    <span className="mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-semibold text-white bg-green-500">
+                    <div className="flex-1">
+                      <p className="text-white font-bold text-xs">Chez Fatou</p>
+                      <p className="text-gray-300 text-[9px]">Restaurant Sénégalais</p>
+                    </div>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-bold text-white bg-green-500">
                       <span className="w-1.5 h-1.5 rounded-full bg-green-200 animate-pulse" />
                       Ouvert
                     </span>
@@ -71,11 +74,11 @@ const HeroSection = () => {
                 </div>
 
                 {/* Category tabs */}
-                <div className="flex gap-1.5 px-3 py-2.5 overflow-hidden">
+                <div className="flex gap-1.5 px-3 py-2 overflow-hidden">
                   {["Tout", "Entrées", "Plats", "Boissons"].map((cat, i) => (
                     <span
                       key={cat}
-                      className="text-[9px] px-2.5 py-1.5 rounded-full font-semibold whitespace-nowrap"
+                      className="text-[8px] px-2 py-1 rounded-full font-semibold whitespace-nowrap"
                       style={i === 0
                         ? { backgroundColor: "#16a34a", color: "#fff" }
                         : { backgroundColor: "#f3f4f6", color: "#374151" }
@@ -86,28 +89,26 @@ const HeroSection = () => {
                   ))}
                 </div>
 
-                {/* Dish cards */}
-                <div className="flex-1 px-3 space-y-2 overflow-hidden">
+                {/* Dish cards with real images */}
+                <div className="flex-1 px-3 space-y-1.5 overflow-hidden">
                   {[
-                    { name: "Thiéboudienne", price: "2 500", popular: true },
-                    { name: "Yassa Poulet", price: "2 000", popular: false },
-                    { name: "Mafé", price: "1 800", popular: false },
+                    { name: "Thiéboudienne", price: "2 500", img: "https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=200&h=200&fit=crop", popular: true },
+                    { name: "Yassa Poulet", price: "2 000", img: "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=200&h=200&fit=crop", popular: false },
+                    { name: "Mafé", price: "1 800", img: "https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=200&h=200&fit=crop", popular: false },
                   ].map((dish) => (
-                    <div key={dish.name} className="flex items-center gap-2.5 p-2 rounded-xl border border-gray-100 hover:shadow-sm">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-100 to-orange-50 flex-shrink-0 flex items-center justify-center text-lg">
-                        🍛
-                      </div>
+                    <div key={dish.name} className="flex items-center gap-2 p-1.5 rounded-xl border border-gray-100">
+                      <img src={dish.img} alt={dish.name} className="w-11 h-11 rounded-lg object-cover flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-1">
-                          <p className="text-[10px] font-bold text-gray-900 truncate">{dish.name}</p>
+                          <p className="text-[9px] font-bold text-gray-900 truncate">{dish.name}</p>
                           {dish.popular && (
-                            <span className="text-[7px] font-bold px-1.5 py-0.5 rounded bg-green-500 text-white flex-shrink-0">
+                            <span className="text-[7px] font-bold px-1 py-0.5 rounded bg-green-500 text-white flex-shrink-0">
                               Populaire
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center justify-between mt-1">
-                          <p className="text-[10px] font-bold text-green-600">{dish.price} FCFA</p>
+                        <div className="flex items-center justify-between mt-0.5">
+                          <p className="text-[9px] font-bold text-green-600">{dish.price} FCFA</p>
                           <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
                             <Plus className="h-3 w-3 text-white" />
                           </div>
@@ -118,8 +119,8 @@ const HeroSection = () => {
                 </div>
 
                 {/* WhatsApp CTA */}
-                <div className="p-3">
-                  <div className="w-full py-2.5 rounded-full bg-green-500 text-white text-center text-[10px] font-bold flex items-center justify-center gap-1.5 shadow-lg">
+                <div className="p-2.5">
+                  <div className="w-full py-2 rounded-full bg-green-500 text-white text-center text-[9px] font-bold flex items-center justify-center gap-1.5 shadow-lg">
                     <Phone className="h-3 w-3" />
                     Commander sur WhatsApp
                   </div>
