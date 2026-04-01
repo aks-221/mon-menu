@@ -103,11 +103,12 @@ const AdminDashboard = () => {
         {/* Sidebar */}
         <aside className="hidden md:flex w-56 border-r border-border bg-card flex-col p-4 min-h-[calc(100vh-3.5rem)]">
           <nav className="space-y-1">
-            {[
+             {([
               { id: "overview" as const, label: "Vue d'ensemble", icon: LayoutDashboard },
               { id: "restaurants" as const, label: "Restaurants", icon: Store },
+              { id: "subscriptions" as const, label: "Abonnements", icon: CreditCard },
               { id: "users" as const, label: "Utilisateurs", icon: Users },
-            ].map(item => (
+            ] as const).map(item => (
               <button key={item.id} onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   activeTab === item.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary"
