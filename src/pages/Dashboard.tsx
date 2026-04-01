@@ -17,6 +17,10 @@ import QrCodeView from "@/components/dashboard/QrCodeView";
 import OrdersManager from "@/components/dashboard/OrdersManager";
 import DeliveryZonesManager from "@/components/dashboard/DeliveryZonesManager";
 import ReservationsManager from "@/components/dashboard/ReservationsManager";
+import TrialBanner from "@/components/dashboard/TrialBanner";
+import PaywallPage from "@/components/dashboard/PaywallPage";
+import SubscribeModal from "@/components/dashboard/SubscribeModal";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const navItems = [
   { id: "home", label: "Aperçu", icon: LayoutDashboard },
