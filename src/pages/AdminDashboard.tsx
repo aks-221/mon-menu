@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard, Store, Users, BarChart3, Loader2, LogOut,
-  Eye, Search, ArrowUpRight, TrendingUp
+  Eye, Search, ArrowUpRight, TrendingUp, CreditCard, CheckCircle, XCircle, Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "restaurants" | "users">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "restaurants" | "users" | "subscriptions">("overview");
 
   // Stats
   const [stats, setStats] = useState({
@@ -30,6 +30,7 @@ const AdminDashboard = () => {
     todayRevenue: 0,
   });
   const [restaurants, setRestaurants] = useState<any[]>([]);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -48,10 +49,11 @@ const AdminDashboard = () => {
   const loadData = async () => {
     const today = new Date().toISOString().split("T")[0];
 
-    const [restos, orders, reservations] = await Promise.all([
+    const [restos, orders, reservations, subs] = await Promise.all([
       supabase.from("restaurants").select("*").order("created_at", { ascending: false }),
       supabase.from("orders").select("id, total, status, created_at"),
       supabase.from("reservations").select("id", { count: "exact", head: true }),
+      supabase.from("subscriptions").select("*"),
     ]);
 
     const allRestos = restos.data || [];
@@ -59,6 +61,7 @@ const AdminDashboard = () => {
     const todayOrders = allOrders.filter(o => o.created_at?.startsWith(today));
 
     setRestaurants(allRestos);
+    setSubscriptions(subs.data || []);
     setStats({
       totalRestaurants: allRestos.length,
       publishedRestaurants: allRestos.filter(r => r.is_published).length,
@@ -100,11 +103,12 @@ const AdminDashboard = () => {
         {/* Sidebar */}
         <aside className="hidden md:flex w-56 border-r border-border bg-card flex-col p-4 min-h-[calc(100vh-3.5rem)]">
           <nav className="space-y-1">
-            {[
+             {([
               { id: "overview" as const, label: "Vue d'ensemble", icon: LayoutDashboard },
               { id: "restaurants" as const, label: "Restaurants", icon: Store },
+              { id: "subscriptions" as const, label: "Abonnements", icon: CreditCard },
               { id: "users" as const, label: "Utilisateurs", icon: Users },
-            ].map(item => (
+            ] as const).map(item => (
               <button key={item.id} onClick={() => setActiveTab(item.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   activeTab === item.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary"
@@ -118,11 +122,12 @@ const AdminDashboard = () => {
 
         {/* Mobile tabs */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border flex z-40">
-          {[
+          {([
             { id: "overview" as const, label: "Aperçu", icon: LayoutDashboard },
             { id: "restaurants" as const, label: "Restos", icon: Store },
+            { id: "subscriptions" as const, label: "Abos", icon: CreditCard },
             { id: "users" as const, label: "Users", icon: Users },
-          ].map(item => (
+          ] as const).map(item => (
             <button key={item.id} onClick={() => setActiveTab(item.id)}
               className={`flex-1 flex flex-col items-center gap-1 py-3 text-[10px] font-medium ${
                 activeTab === item.id ? "text-primary" : "text-muted-foreground"
@@ -251,6 +256,14 @@ const AdminDashboard = () => {
             </div>
           )}
 
+          {activeTab === "subscriptions" && (
+            <SubscriptionsTab 
+              restaurants={restaurants} 
+              subscriptions={subscriptions} 
+              onReload={loadData} 
+            />
+          )}
+
           {activeTab === "users" && (
             <div className="space-y-4">
               <h1 className="text-2xl font-bold">Utilisateurs</h1>
@@ -278,6 +291,98 @@ const AdminDashboard = () => {
             </div>
           )}
         </main>
+      </div>
+    </div>
+  );
+};
+
+// Subscriptions management tab
+const SubscriptionsTab = ({ restaurants, subscriptions, onReload }: { 
+  restaurants: any[]; subscriptions: any[]; onReload: () => void;
+}) => {
+  const activateSub = async (restaurantId: string) => {
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 30);
+    await supabase.from("subscriptions").upsert({
+      restaurant_id: restaurantId,
+      status: "active",
+      plan_name: "pro",
+      price: 6600,
+      starts_at: new Date().toISOString(),
+      expires_at: expiresAt.toISOString(),
+    }, { onConflict: "restaurant_id" });
+    onReload();
+  };
+
+  const deactivateSub = async (restaurantId: string) => {
+    await supabase.from("subscriptions")
+      .update({ status: "expired" })
+      .eq("restaurant_id", restaurantId);
+    onReload();
+  };
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Abonnements</h1>
+      <div className="space-y-2">
+        {restaurants.map(r => {
+          const sub = subscriptions.find(s => s.restaurant_id === r.id);
+          const isActive = sub?.status === "active" && new Date(sub.expires_at) > new Date();
+          const isPending = sub?.status === "pending";
+          const trialEnd = new Date(r.trial_ends_at);
+          const trialActive = trialEnd > new Date();
+          const trialDays = Math.max(0, Math.ceil((trialEnd.getTime() - Date.now()) / (1000*60*60*24)));
+
+          return (
+            <Card key={r.id}>
+              <CardContent className="p-4 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  {r.logo_url ? (
+                    <img src={r.logo_url} className="w-10 h-10 rounded-full object-cover flex-shrink-0" alt="" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold flex-shrink-0">
+                      {r.name.charAt(0)}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="font-semibold truncate">{r.name}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {isActive ? (
+                        <Badge className="bg-green-500/10 text-green-600 text-[10px] gap-1">
+                          <CheckCircle className="h-3 w-3" /> Abonné
+                        </Badge>
+                      ) : isPending ? (
+                        <Badge className="bg-yellow-500/10 text-yellow-600 text-[10px] gap-1">
+                          <Clock className="h-3 w-3" /> En attente
+                        </Badge>
+                      ) : trialActive ? (
+                        <Badge variant="outline" className="text-[10px] gap-1">
+                          <Clock className="h-3 w-3" /> Essai ({trialDays}j)
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive" className="text-[10px] gap-1">
+                          <XCircle className="h-3 w-3" /> Expiré
+                        </Badge>
+                      )}
+                      {sub && <span className="text-[10px] text-muted-foreground">Expire: {new Date(sub.expires_at).toLocaleDateString("fr-FR")}</span>}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 flex-shrink-0">
+                  {!isActive ? (
+                    <Button size="sm" className="gradient-primary text-primary-foreground rounded-lg text-xs" onClick={() => activateSub(r.id)}>
+                      Activer
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="destructive" className="rounded-lg text-xs" onClick={() => deactivateSub(r.id)}>
+                      Désactiver
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

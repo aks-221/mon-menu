@@ -17,6 +17,10 @@ import QrCodeView from "@/components/dashboard/QrCodeView";
 import OrdersManager from "@/components/dashboard/OrdersManager";
 import DeliveryZonesManager from "@/components/dashboard/DeliveryZonesManager";
 import ReservationsManager from "@/components/dashboard/ReservationsManager";
+import TrialBanner from "@/components/dashboard/TrialBanner";
+import PaywallPage from "@/components/dashboard/PaywallPage";
+import SubscribeModal from "@/components/dashboard/SubscribeModal";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const navItems = [
   { id: "home", label: "Aperçu", icon: LayoutDashboard },
@@ -37,7 +41,9 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [orderCount, setOrderCount] = useState(0);
   const [reservationCount, setReservationCount] = useState(0);
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const { user, signOut, loading: authLoading } = useAuth();
+  const { trialDaysLeft, isTrialActive, isSubscribed, hasAccess, loading: subLoading } = useSubscription(restaurant);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -87,7 +93,7 @@ const Dashboard = () => {
     navigate("/");
   };
 
-  if (authLoading || loading) {
+  if (authLoading || loading || subLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -106,6 +112,20 @@ const Dashboard = () => {
           </Link>
         </div>
       </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <>
+        <PaywallPage onSubscribe={() => setShowSubscribeModal(true)} />
+        <SubscribeModal
+          open={showSubscribeModal}
+          onOpenChange={setShowSubscribeModal}
+          restaurant={restaurant}
+          onSuccess={() => window.location.reload()}
+        />
+      </>
     );
   }
 
@@ -160,7 +180,18 @@ const Dashboard = () => {
         </div>
       </aside>
 
-      <main className="flex-1 md:p-6 p-4 pt-18 md:pt-6 overflow-auto">{renderContent()}</main>
+      <main className="flex-1 md:p-6 p-4 pt-18 md:pt-6 overflow-auto">
+        {!isSubscribed && isTrialActive && (
+          <TrialBanner daysLeft={trialDaysLeft} isSubscribed={isSubscribed} onSubscribe={() => setShowSubscribeModal(true)} />
+        )}
+        {renderContent()}
+      </main>
+      <SubscribeModal
+        open={showSubscribeModal}
+        onOpenChange={setShowSubscribeModal}
+        restaurant={restaurant}
+        onSuccess={() => window.location.reload()}
+      />
     </div>
   );
 };
