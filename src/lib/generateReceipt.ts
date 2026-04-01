@@ -17,6 +17,10 @@ interface ReceiptData {
   createdAt: string;
 }
 
+function formatPrice(value: number): string {
+  return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
 export function generateReceipt(data: ReceiptData) {
   const doc = new jsPDF({ unit: "mm", format: [80, 200] }); // receipt width 80mm
   const w = 80;
@@ -74,7 +78,7 @@ export function generateReceipt(data: ReceiptData) {
     const name = item.dish_name.length > 22 ? item.dish_name.slice(0, 22) + "…" : item.dish_name;
     doc.text(name, 5, y);
     doc.text(String(item.quantity), 48, y);
-    doc.text(`${Number(item.total_price).toLocaleString()} F`, w - 5, y, { align: "right" });
+    doc.text(`${formatPrice(item.total_price)} F`, w - 5, y, { align: "right" });
     y += 4;
   });
 
@@ -84,19 +88,19 @@ export function generateReceipt(data: ReceiptData) {
   // Totals
   doc.setFontSize(7);
   doc.text("Sous-total:", 5, y);
-  doc.text(`${Number(data.subtotal).toLocaleString()} FCFA`, w - 5, y, { align: "right" });
+  doc.text(`${formatPrice(data.subtotal)} FCFA`, w - 5, y, { align: "right" });
   y += 4;
 
   if (data.deliveryFee > 0) {
     doc.text("Livraison:", 5, y);
-    doc.text(`${Number(data.deliveryFee).toLocaleString()} FCFA`, w - 5, y, { align: "right" });
+    doc.text(`${formatPrice(data.deliveryFee)} FCFA`, w - 5, y, { align: "right" });
     y += 4;
   }
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
   doc.text("TOTAL:", 5, y);
-  doc.text(`${Number(data.total).toLocaleString()} FCFA`, w - 5, y, { align: "right" });
+  doc.text(`${formatPrice(data.total)} FCFA`, w - 5, y, { align: "right" });
   y += 5;
 
   doc.setFont("helvetica", "normal");
