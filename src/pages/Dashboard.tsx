@@ -180,7 +180,18 @@ const Dashboard = () => {
         </div>
       </aside>
 
-      <main className="flex-1 md:p-6 p-4 pt-18 md:pt-6 overflow-auto">{renderContent()}</main>
+      <main className="flex-1 md:p-6 p-4 pt-18 md:pt-6 overflow-auto">
+        {!isSubscribed && isTrialActive && (
+          <TrialBanner daysLeft={trialDaysLeft} isSubscribed={isSubscribed} onSubscribe={() => setShowSubscribeModal(true)} />
+        )}
+        {renderContent()}
+      </main>
+      <SubscribeModal
+        open={showSubscribeModal}
+        onOpenChange={setShowSubscribeModal}
+        restaurant={restaurant}
+        onSuccess={() => window.location.reload()}
+      />
     </div>
   );
 };
