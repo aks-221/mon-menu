@@ -61,6 +61,7 @@ const AdminDashboard = () => {
     const todayOrders = allOrders.filter(o => o.created_at?.startsWith(today));
 
     setRestaurants(allRestos);
+    setSubscriptions(subs.data || []);
     setStats({
       totalRestaurants: allRestos.length,
       publishedRestaurants: allRestos.filter(r => r.is_published).length,
