@@ -256,6 +256,14 @@ const AdminDashboard = () => {
             </div>
           )}
 
+          {activeTab === "subscriptions" && (
+            <SubscriptionsTab 
+              restaurants={restaurants} 
+              subscriptions={subscriptions} 
+              onReload={loadData} 
+            />
+          )}
+
           {activeTab === "users" && (
             <div className="space-y-4">
               <h1 className="text-2xl font-bold">Utilisateurs</h1>
