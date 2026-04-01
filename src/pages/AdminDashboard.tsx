@@ -122,11 +122,12 @@ const AdminDashboard = () => {
 
         {/* Mobile tabs */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border flex z-40">
-          {[
+          {([
             { id: "overview" as const, label: "Aperçu", icon: LayoutDashboard },
             { id: "restaurants" as const, label: "Restos", icon: Store },
+            { id: "subscriptions" as const, label: "Abos", icon: CreditCard },
             { id: "users" as const, label: "Users", icon: Users },
-          ].map(item => (
+          ] as const).map(item => (
             <button key={item.id} onClick={() => setActiveTab(item.id)}
               className={`flex-1 flex flex-col items-center gap-1 py-3 text-[10px] font-medium ${
                 activeTab === item.id ? "text-primary" : "text-muted-foreground"
