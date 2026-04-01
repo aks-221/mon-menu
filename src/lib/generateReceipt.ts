@@ -84,7 +84,7 @@ export function generateReceipt(data: ReceiptData) {
   // Totals
   doc.setFontSize(7);
   doc.text("Sous-total:", 5, y);
-  doc.text(`${Number(data.subtotal).toLocaleString()} FCFA`, w - 5, y, { align: "right" });
+  doc.text(`${formatPrice(data.subtotal)} FCFA`, w - 5, y, { align: "right" });
   y += 4;
 
   if (data.deliveryFee > 0) {
