@@ -74,7 +74,7 @@ export function generateReceipt(data: ReceiptData) {
     const name = item.dish_name.length > 22 ? item.dish_name.slice(0, 22) + "…" : item.dish_name;
     doc.text(name, 5, y);
     doc.text(String(item.quantity), 48, y);
-    doc.text(`${Number(item.total_price).toLocaleString()} F`, w - 5, y, { align: "right" });
+    doc.text(`${formatPrice(item.total_price)} F`, w - 5, y, { align: "right" });
     y += 4;
   });
 
