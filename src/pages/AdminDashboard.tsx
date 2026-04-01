@@ -296,4 +296,96 @@ const AdminDashboard = () => {
   );
 };
 
+// Subscriptions management tab
+const SubscriptionsTab = ({ restaurants, subscriptions, onReload }: { 
+  restaurants: any[]; subscriptions: any[]; onReload: () => void;
+}) => {
+  const activateSub = async (restaurantId: string) => {
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 30);
+    await supabase.from("subscriptions").upsert({
+      restaurant_id: restaurantId,
+      status: "active",
+      plan_name: "pro",
+      price: 6600,
+      starts_at: new Date().toISOString(),
+      expires_at: expiresAt.toISOString(),
+    }, { onConflict: "restaurant_id" });
+    onReload();
+  };
+
+  const deactivateSub = async (restaurantId: string) => {
+    await supabase.from("subscriptions")
+      .update({ status: "expired" })
+      .eq("restaurant_id", restaurantId);
+    onReload();
+  };
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Abonnements</h1>
+      <div className="space-y-2">
+        {restaurants.map(r => {
+          const sub = subscriptions.find(s => s.restaurant_id === r.id);
+          const isActive = sub?.status === "active" && new Date(sub.expires_at) > new Date();
+          const isPending = sub?.status === "pending";
+          const trialEnd = new Date(r.trial_ends_at);
+          const trialActive = trialEnd > new Date();
+          const trialDays = Math.max(0, Math.ceil((trialEnd.getTime() - Date.now()) / (1000*60*60*24)));
+
+          return (
+            <Card key={r.id}>
+              <CardContent className="p-4 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  {r.logo_url ? (
+                    <img src={r.logo_url} className="w-10 h-10 rounded-full object-cover flex-shrink-0" alt="" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold flex-shrink-0">
+                      {r.name.charAt(0)}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="font-semibold truncate">{r.name}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {isActive ? (
+                        <Badge className="bg-green-500/10 text-green-600 text-[10px] gap-1">
+                          <CheckCircle className="h-3 w-3" /> Abonné
+                        </Badge>
+                      ) : isPending ? (
+                        <Badge className="bg-yellow-500/10 text-yellow-600 text-[10px] gap-1">
+                          <Clock className="h-3 w-3" /> En attente
+                        </Badge>
+                      ) : trialActive ? (
+                        <Badge variant="outline" className="text-[10px] gap-1">
+                          <Clock className="h-3 w-3" /> Essai ({trialDays}j)
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive" className="text-[10px] gap-1">
+                          <XCircle className="h-3 w-3" /> Expiré
+                        </Badge>
+                      )}
+                      {sub && <span className="text-[10px] text-muted-foreground">Expire: {new Date(sub.expires_at).toLocaleDateString("fr-FR")}</span>}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 flex-shrink-0">
+                  {!isActive ? (
+                    <Button size="sm" className="gradient-primary text-primary-foreground rounded-lg text-xs" onClick={() => activateSub(r.id)}>
+                      Activer
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="destructive" className="rounded-lg text-xs" onClick={() => deactivateSub(r.id)}>
+                      Désactiver
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 export default AdminDashboard;
