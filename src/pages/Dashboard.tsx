@@ -41,7 +41,9 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [orderCount, setOrderCount] = useState(0);
   const [reservationCount, setReservationCount] = useState(0);
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const { user, signOut, loading: authLoading } = useAuth();
+  const { trialDaysLeft, isTrialActive, isSubscribed, hasAccess, loading: subLoading } = useSubscription(restaurant);
   const navigate = useNavigate();
 
   useEffect(() => {
