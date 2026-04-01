@@ -96,7 +96,7 @@ export function generateReceipt(data: ReceiptData) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
   doc.text("TOTAL:", 5, y);
-  doc.text(`${Number(data.total).toLocaleString()} FCFA`, w - 5, y, { align: "right" });
+  doc.text(`${formatPrice(data.total)} FCFA`, w - 5, y, { align: "right" });
   y += 5;
 
   doc.setFont("helvetica", "normal");
