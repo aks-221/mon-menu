@@ -1,8 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { Download, QrCode } from "lucide-react";
+import { Download } from "lucide-react";
+import { QRCodeCanvas } from "qrcode.react";
+import { useRef } from "react";
 
 const QrCodeView = ({ restaurant }: { restaurant: any }) => {
   const url = `${window.location.origin}/restaurant/${restaurant.slug}`;
+  const qrRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = () => {
+    const canvas = qrRef.current?.querySelector("canvas");
+    if (!canvas) return;
+    const link = document.createElement("a");
+    link.download = `qr-${restaurant.slug}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
 
   return (
     <div className="space-y-6 max-w-md">
@@ -12,13 +24,11 @@ const QrCodeView = ({ restaurant }: { restaurant: any }) => {
       </div>
 
       <div className="bg-card rounded-2xl border border-border p-8 text-center space-y-4">
-        <div className="w-48 h-48 mx-auto bg-foreground rounded-2xl flex items-center justify-center">
-          <div className="w-40 h-40 bg-background rounded-xl flex items-center justify-center">
-            <QrCode className="h-32 w-32 text-foreground" />
-          </div>
+        <div ref={qrRef} className="w-48 h-48 mx-auto bg-white rounded-2xl flex items-center justify-center p-3">
+          <QRCodeCanvas value={url} size={168} level="H" includeMargin={false} />
         </div>
         <p className="text-sm text-muted-foreground break-all">{url}</p>
-        <Button className="gradient-primary text-primary-foreground shadow-warm rounded-xl">
+        <Button onClick={handleDownload} className="gradient-primary text-primary-foreground shadow-warm rounded-xl">
           <Download className="h-4 w-4 mr-2" />
           Télécharger en PNG
         </Button>
