@@ -363,6 +363,7 @@ export type Database = {
           social_facebook: string | null
           social_instagram: string | null
           theme: string | null
+          trial_ends_at: string | null
           updated_at: string
           user_id: string
           whatsapp: string | null
@@ -386,6 +387,7 @@ export type Database = {
           social_facebook?: string | null
           social_instagram?: string | null
           theme?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
           user_id: string
           whatsapp?: string | null
@@ -409,11 +411,56 @@ export type Database = {
           social_facebook?: string | null
           social_instagram?: string | null
           theme?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
           user_id?: string
           whatsapp?: string | null
         }
         Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          plan_name: string
+          price: number
+          restaurant_id: string
+          starts_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          plan_name?: string
+          price?: number
+          restaurant_id: string
+          starts_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          plan_name?: string
+          price?: number
+          restaurant_id?: string
+          starts_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: true
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
