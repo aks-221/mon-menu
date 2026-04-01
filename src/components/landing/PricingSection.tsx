@@ -1,55 +1,19 @@
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, Zap, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
-const plans = [
-  {
-    name: "Gratuit",
-    price: "0",
-    period: "",
-    description: "Parfait pour commencer",
-    features: [
-      "1 restaurant",
-      "Jusqu'à 20 plats",
-      "Page publique",
-      "Bouton WhatsApp",
-      "Branding MenuUp",
-    ],
-    cta: "Commencer gratuitement",
-    popular: false,
-  },
-  {
-    name: "Pro",
-    price: "3 000",
-    period: "/ mois",
-    description: "Pour les restaurants sérieux",
-    features: [
-      "Plats illimités",
-      "QR Code téléchargeable",
-      "Statistiques de vues",
-      "Sans branding MenuUp",
-      "Couleur personnalisée",
-      "Support par email",
-    ],
-    cta: "Passer au Pro",
-    popular: true,
-  },
-  {
-    name: "Business",
-    price: "6 000",
-    period: "/ mois",
-    description: "Pour les chaînes & groupes",
-    features: [
-      "Plusieurs restaurants",
-      "Statistiques avancées",
-      "Support prioritaire",
-      "Personnalisation complète",
-      "Tout le plan Pro inclus",
-    ],
-    cta: "Nous contacter",
-    popular: false,
-  },
+const features = [
+  "Plats illimités",
+  "Commandes en ligne",
+  "Zones de livraison",
+  "Réservations",
+  "Statistiques & graphiques",
+  "QR Code téléchargeable",
+  "Reçus PDF",
+  "Notifications WhatsApp",
+  "Page publique personnalisée",
+  "Sans branding MenuUp",
 ];
 
 const PricingSection = () => {
@@ -63,61 +27,60 @@ const PricingSection = () => {
           className="text-center mb-14"
         >
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
-            Des prix pensés pour{" "}
-            <span className="text-gradient">l'Afrique</span>
+            Un prix simple,{" "}
+            <span className="text-gradient">sans surprise</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto text-lg">
-            Commencez gratuitement, évoluez à votre rythme. Tous les prix sont en FCFA.
+            Essayez gratuitement pendant 15 jours. Aucune carte bancaire requise.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          {plans.map((plan, i) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className={`relative rounded-2xl p-6 border-2 transition-all ${
-                plan.popular
-                  ? "border-primary shadow-warm bg-card scale-105"
-                  : "border-border bg-card hover:border-primary/30"
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full gradient-primary text-primary-foreground text-xs font-bold">
-                  Populaire
-                </div>
-              )}
-              <div className="mb-6">
-                <h3 className="text-lg font-bold mb-1">{plan.name}</h3>
-                <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold">{plan.price}</span>
-                  <span className="text-muted-foreground text-sm">FCFA {plan.period}</span>
-                </div>
+        <div className="max-w-md mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative rounded-2xl p-8 border-2 border-primary shadow-warm bg-card"
+          >
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full gradient-primary text-primary-foreground text-xs font-bold flex items-center gap-1.5">
+              <Gift className="h-3.5 w-3.5" />
+              15 jours gratuits
+            </div>
+
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-bold mb-1">MenuUp Pro</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Tout ce qu'il faut pour gérer votre restaurant en ligne
+              </p>
+              <div className="flex items-baseline justify-center gap-1">
+                <span className="text-5xl font-extrabold">6 600</span>
+                <span className="text-muted-foreground text-sm">FCFA / mois</span>
               </div>
-              <ul className="space-y-3 mb-6">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link to="/register">
-                <Button
-                  className={`w-full rounded-xl py-5 ${
-                    plan.popular ? "gradient-primary text-primary-foreground shadow-warm" : ""
-                  }`}
-                  variant={plan.popular ? "default" : "outline"}
-                >
-                  {plan.cta}
-                </Button>
-              </Link>
-            </motion.div>
-          ))}
+              <p className="text-xs text-muted-foreground mt-2">
+                Après la période d'essai gratuite de 15 jours
+              </p>
+            </div>
+
+            <ul className="space-y-3 mb-8">
+              {features.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+
+            <Link to="/register">
+              <Button className="w-full gradient-primary text-primary-foreground rounded-xl py-6 text-base gap-2 shadow-warm">
+                <Zap className="h-4 w-4" />
+                Commencer l'essai gratuit
+              </Button>
+            </Link>
+
+            <p className="text-xs text-center text-muted-foreground mt-4">
+              Aucune carte bancaire requise • Annulez à tout moment
+            </p>
+          </motion.div>
         </div>
       </div>
     </section>
