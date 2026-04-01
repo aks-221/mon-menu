@@ -49,10 +49,11 @@ const AdminDashboard = () => {
   const loadData = async () => {
     const today = new Date().toISOString().split("T")[0];
 
-    const [restos, orders, reservations] = await Promise.all([
+    const [restos, orders, reservations, subs] = await Promise.all([
       supabase.from("restaurants").select("*").order("created_at", { ascending: false }),
       supabase.from("orders").select("id, total, status, created_at"),
       supabase.from("reservations").select("id", { count: "exact", head: true }),
+      supabase.from("subscriptions").select("*"),
     ]);
 
     const allRestos = restos.data || [];
