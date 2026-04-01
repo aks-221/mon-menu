@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard, Store, Users, BarChart3, Loader2, LogOut,
-  Eye, Search, ArrowUpRight, TrendingUp
+  Eye, Search, ArrowUpRight, TrendingUp, CreditCard, CheckCircle, XCircle, Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
