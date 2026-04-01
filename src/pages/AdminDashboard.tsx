@@ -30,6 +30,7 @@ const AdminDashboard = () => {
     todayRevenue: 0,
   });
   const [restaurants, setRestaurants] = useState<any[]>([]);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
