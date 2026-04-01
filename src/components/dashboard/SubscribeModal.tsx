@@ -1,0 +1,120 @@
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Check, MessageSquare, CreditCard, Banknote } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface SubscribeModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  restaurant: any;
+  onSuccess: () => void;
+}
+
+const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: SubscribeModalProps) => {
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubscribe = async (method: string) => {
+    setLoading(true);
+    try {
+      // For MVP: create subscription entry (manual validation by admin)
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30);
+
+      const { error } = await supabase.from("subscriptions").upsert({
+        restaurant_id: restaurant.id,
+        status: "pending",
+        plan_name: "pro",
+        price: 6600,
+        starts_at: new Date().toISOString(),
+        expires_at: expiresAt.toISOString(),
+      }, { onConflict: "restaurant_id" });
+
+      if (error) throw error;
+
+      // Send WhatsApp notification
+      const msg = encodeURIComponent(
+        `Bonjour, je souhaite m'abonner à MenuUp Pro (6 600 FCFA/mois).\n\nRestaurant: ${restaurant.name}\nMéthode: ${method}`
+      );
+      window.open(`https://wa.me/221700000000?text=${msg}`, "_blank");
+
+      toast({
+        title: "Demande envoyée !",
+        description: "Nous allons valider votre abonnement sous 24h.",
+      });
+
+      onSuccess();
+      onOpenChange(false);
+    } catch (err) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue. Réessayez.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-extrabold">S'abonner à MenuUp Pro</DialogTitle>
+          <DialogDescription>
+            Accès complet à toutes les fonctionnalités pour 6 600 FCFA / mois
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 pt-2">
+          <div className="bg-muted/50 rounded-xl p-4 space-y-2">
+            {["Menu illimité", "Commandes & livraison", "Statistiques", "QR Code & reçus PDF"].map(f => (
+              <div key={f} className="flex items-center gap-2 text-sm">
+                <Check className="h-4 w-4 text-primary" />
+                <span>{f}</span>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-sm text-muted-foreground text-center">Choisissez votre méthode de paiement :</p>
+
+          <div className="grid gap-2">
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-3 py-5 rounded-xl"
+              onClick={() => handleSubscribe("Wave")}
+              disabled={loading}
+            >
+              <Banknote className="h-5 w-5 text-primary" />
+              <div className="text-left">
+                <div className="font-medium">Wave / Orange Money</div>
+                <div className="text-xs text-muted-foreground">Paiement mobile</div>
+              </div>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-3 py-5 rounded-xl"
+              onClick={() => handleSubscribe("Virement")}
+              disabled={loading}
+            >
+              <CreditCard className="h-5 w-5 text-primary" />
+              <div className="text-left">
+                <div className="font-medium">Virement bancaire</div>
+                <div className="text-xs text-muted-foreground">Par transfert</div>
+              </div>
+            </Button>
+          </div>
+
+          <p className="text-xs text-center text-muted-foreground">
+            Après paiement, votre abonnement sera activé sous 24h.
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default SubscribeModal;
