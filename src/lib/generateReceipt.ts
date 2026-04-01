@@ -89,7 +89,7 @@ export function generateReceipt(data: ReceiptData) {
 
   if (data.deliveryFee > 0) {
     doc.text("Livraison:", 5, y);
-    doc.text(`${Number(data.deliveryFee).toLocaleString()} FCFA`, w - 5, y, { align: "right" });
+    doc.text(`${formatPrice(data.deliveryFee)} FCFA`, w - 5, y, { align: "right" });
     y += 4;
   }
 
