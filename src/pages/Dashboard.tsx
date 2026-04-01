@@ -115,6 +115,20 @@ const Dashboard = () => {
     );
   }
 
+  if (!hasAccess) {
+    return (
+      <>
+        <PaywallPage onSubscribe={() => setShowSubscribeModal(true)} />
+        <SubscribeModal
+          open={showSubscribeModal}
+          onOpenChange={setShowSubscribeModal}
+          restaurant={restaurant}
+          onSuccess={() => window.location.reload()}
+        />
+      </>
+    );
+  }
+
   const renderContent = () => {
     switch (activeTab) {
       case "home": return <DashboardHome restaurant={restaurant} onNavigate={setActiveTab} />;
