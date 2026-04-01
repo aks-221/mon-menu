@@ -17,6 +17,10 @@ interface ReceiptData {
   createdAt: string;
 }
 
+function formatPrice(value: number): string {
+  return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
 export function generateReceipt(data: ReceiptData) {
   const doc = new jsPDF({ unit: "mm", format: [80, 200] }); // receipt width 80mm
   const w = 80;
