@@ -104,16 +104,36 @@ const ReservationsManager = ({ restaurant }: { restaurant: any }) => {
                 </div>
               </div>
 
-              {res.status === "en_attente" && (
-                <div className="flex gap-2 mt-3 ml-13">
-                  <Button size="sm" className="rounded-xl text-xs gradient-primary text-primary-foreground" onClick={() => updateStatus(res.id, "acceptee")}>
-                    <Check className="h-3 w-3 mr-1" /> Accepter
-                  </Button>
-                  <Button size="sm" variant="outline" className="rounded-xl text-xs text-destructive border-destructive/30" onClick={() => updateStatus(res.id, "refusee")}>
-                    <X className="h-3 w-3 mr-1" /> Refuser
-                  </Button>
-                </div>
-              )}
+              <div className="flex gap-2 mt-3 ml-13 flex-wrap">
+                {res.status === "en_attente" && (
+                  <>
+                    <Button size="sm" className="rounded-xl text-xs gradient-primary text-primary-foreground" onClick={() => updateStatus(res.id, "acceptee")}>
+                      <Check className="h-3 w-3 mr-1" /> Accepter
+                    </Button>
+                    <Button size="sm" variant="outline" className="rounded-xl text-xs text-destructive border-destructive/30" onClick={() => updateStatus(res.id, "refusee")}>
+                      <X className="h-3 w-3 mr-1" /> Refuser
+                    </Button>
+                  </>
+                )}
+                <Button size="sm" variant="outline" className="rounded-xl text-xs" onClick={() => {
+                  generateReservationReceipt({
+                    restaurantName: restaurant.name,
+                    restaurantPhone: restaurant.phone,
+                    restaurantAddress: restaurant.address,
+                    reservationId: res.id,
+                    customerName: res.customer_name,
+                    customerPhone: res.customer_phone,
+                    reservationDate: res.reservation_date,
+                    reservationTime: res.reservation_time,
+                    partySize: res.party_size,
+                    status: res.status,
+                    notes: res.notes,
+                    createdAt: res.created_at,
+                  });
+                }}>
+                  <FileText className="h-3 w-3 mr-1" /> Imprimer
+                </Button>
+              </div>
             </div>
           ))}
         </div>
