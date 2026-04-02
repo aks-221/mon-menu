@@ -20,16 +20,23 @@ const HeroSection = () => {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
               Créez le site de votre restaurant{" "}
-              <span className="text-gradient">gratuitement</span>
+              <span className="text-gradient">en 5 minutes</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg">
               MenuUp permet à n'importe quel restaurant de créer une page professionnelle 
-              avec menu, localisation et bouton WhatsApp — en quelques minutes seulement.
+              avec menu, commandes en ligne et WhatsApp — sans aucune compétence technique.
             </p>
+
+            <div className="inline-flex items-center gap-2 rounded-xl bg-accent/10 border border-accent/20 px-4 py-2.5 text-sm">
+              <Star className="h-4 w-4 text-accent fill-accent" />
+              <span className="font-semibold text-accent">15 jours d'essai gratuit</span>
+              <span className="text-muted-foreground">puis 6 600 FCFA/mois</span>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/register">
                 <Button size="lg" className="gradient-primary text-primary-foreground shadow-warm text-base px-8 py-6 rounded-xl">
-                  Commencer gratuitement
+                  Essayer gratuitement 15 jours
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -40,7 +47,7 @@ const HeroSection = () => {
               </Link>
             </div>
             <p className="text-sm text-muted-foreground">
-              ✓ Gratuit — ✓ Sans carte bancaire — ✓ En ligne en 5 minutes
+              ✓ Sans carte bancaire — ✓ Accès complet — ✓ Annulez à tout moment
             </p>
           </motion.div>
 
