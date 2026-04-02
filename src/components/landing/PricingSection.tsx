@@ -27,11 +27,11 @@ const PricingSection = () => {
           className="text-center mb-14"
         >
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
-            Un prix simple,{" "}
-            <span className="text-gradient">sans surprise</span>
+            Essayez 15 jours,{" "}
+            <span className="text-gradient">puis décidez</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto text-lg">
-            Essayez gratuitement pendant 15 jours. Aucune carte bancaire requise.
+            Accès complet pendant 15 jours, sans carte bancaire. Continuez à seulement 6 600 FCFA/mois.
           </p>
         </motion.div>
 
