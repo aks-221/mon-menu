@@ -46,7 +46,7 @@ const Register = () => {
         });
       }
 
-      toast.success("Compte créé ! Bienvenue sur MenuUp 🎉");
+      toast.success("Compte créé ! Bienvenue sur SamaMenu 🎉");
       navigate("/dashboard");
     } catch (err: any) {
       toast.error(err?.message || "Erreur lors de la création du compte");

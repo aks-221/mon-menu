@@ -13,7 +13,7 @@ const features = [
   "Reçus PDF",
   "Notifications WhatsApp",
   "Page publique personnalisée",
-  "Sans branding MenuUp",
+  "Sans branding SamaMenu",
 ];
 
 const PricingSection = () => {
@@ -48,7 +48,7 @@ const PricingSection = () => {
             </div>
 
             <div className="text-center mb-6">
-              <h3 className="text-lg font-bold mb-1">MenuUp Pro</h3>
+              <h3 className="text-lg font-bold mb-1">SamaMenu Pro</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Tout ce qu'il faut pour gérer votre restaurant en ligne
               </p>

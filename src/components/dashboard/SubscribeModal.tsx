@@ -36,7 +36,7 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
 
       // Send WhatsApp notification
       const msg = encodeURIComponent(
-        `Bonjour, je souhaite m'abonner à MenuUp Pro (6 600 FCFA/mois).\n\nRestaurant: ${restaurant.name}\nMéthode: ${method}`
+        `Bonjour, je souhaite m'abonner à SamaMenu Pro (6 600 FCFA/mois).\n\nRestaurant: ${restaurant.name}\nMéthode: ${method}`
       );
       window.open(`https://wa.me/221700000000?text=${msg}`, "_blank");
 
@@ -62,7 +62,7 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-extrabold">S'abonner à MenuUp Pro</DialogTitle>
+          <DialogTitle className="text-xl font-extrabold">S'abonner à SamaMenu Pro</DialogTitle>
           <DialogDescription>
             Accès complet à toutes les fonctionnalités pour 6 600 FCFA / mois
           </DialogDescription>

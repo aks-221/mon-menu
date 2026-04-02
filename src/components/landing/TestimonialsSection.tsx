@@ -5,7 +5,7 @@ const testimonials = [
   {
     name: "Fatou Diallo",
     role: "Gérante, Chez Fatou",
-    text: "Grâce à MenuUp, mes clients consultent mon menu avant de venir. J'ai gagné 30% de commandes en plus via WhatsApp !",
+    text: "Grâce à SamaMenu, mes clients consultent mon menu avant de venir. J'ai gagné 30% de commandes en plus via WhatsApp !",
     rating: 5,
   },
   {
@@ -34,7 +34,7 @@ const TestimonialsSection = () => {
         >
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
             Ils utilisent{" "}
-            <span className="text-gradient">MenuUp</span>
+            <span className="text-gradient">SamaMenu</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto text-lg">
             Des restaurateurs comme vous ont déjà fait le pas.

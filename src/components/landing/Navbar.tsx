@@ -10,7 +10,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
         <Link to="/" className="text-xl font-extrabold">
-          Menu<span className="text-primary">Up</span>
+          Sama<span className="text-primary">Menu</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">

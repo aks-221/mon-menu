@@ -49,7 +49,7 @@ const FeaturesSection = () => {
             <span className="text-gradient">votre restaurant</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Pas besoin de compétences techniques. MenuUp s'occupe de tout.
+            Pas besoin de compétences techniques. SamaMenu s'occupe de tout.
           </p>
         </motion.div>
 

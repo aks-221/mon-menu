@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           <div className="space-y-3">
             <h3 className="text-xl font-extrabold text-background">
-              Menu<span className="text-primary">Up</span>
+              Sama<span className="text-primary">Menu</span>
             </h3>
             <p className="text-sm text-background/60 leading-relaxed">
               La solution la plus simple pour mettre votre restaurant en ligne au Sénégal.
@@ -43,7 +43,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="border-t border-background/10 pt-6 text-center text-xs text-background/40">
-          © {new Date().getFullYear()} MenuUp. Fait avec ❤️ au Sénégal.
+          © {new Date().getFullYear()} SamaMenu. Fait avec ❤️ au Sénégal.
         </div>
       </div>
     </footer>

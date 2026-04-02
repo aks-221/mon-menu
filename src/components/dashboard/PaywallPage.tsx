@@ -27,13 +27,13 @@ const PaywallPage = ({ onSubscribe }: PaywallPageProps) => {
         <div className="space-y-2">
           <h1 className="text-2xl font-extrabold">Votre essai est terminé</h1>
           <p className="text-muted-foreground">
-            Abonnez-vous pour continuer à utiliser MenuUp et développer votre restaurant.
+            Abonnez-vous pour continuer à utiliser SamaMenu et développer votre restaurant.
           </p>
         </div>
 
         <div className="bg-card border-2 border-primary rounded-2xl p-6 text-left space-y-5">
           <div className="text-center">
-            <div className="text-sm text-muted-foreground mb-1">Plan MenuUp Pro</div>
+            <div className="text-sm text-muted-foreground mb-1">Plan SamaMenu Pro</div>
             <div className="flex items-baseline justify-center gap-1">
               <span className="text-4xl font-extrabold">6 600</span>
               <span className="text-muted-foreground text-sm">FCFA / mois</span>
@@ -59,7 +59,7 @@ const PaywallPage = ({ onSubscribe }: PaywallPageProps) => {
 
           <div className="text-center">
             <a
-              href="https://wa.me/221700000000?text=Bonjour%2C%20je%20souhaite%20m'abonner%20à%20MenuUp"
+              href="https://wa.me/221700000000?text=Bonjour%2C%20je%20souhaite%20m'abonner%20à%20SamaMenu"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
