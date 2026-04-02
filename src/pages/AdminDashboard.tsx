@@ -91,7 +91,7 @@ const AdminDashboard = () => {
       {/* Top bar */}
       <header className="border-b border-border bg-card px-4 md:px-6 h-14 flex items-center justify-between sticky top-0 z-40">
         <Link to="/" className="font-extrabold text-lg">
-          Menu<span className="text-primary">Up</span>
+          Sama<span className="text-primary">Menu</span>
           <Badge variant="destructive" className="ml-2 text-[10px]">Admin</Badge>
         </Link>
         <Button variant="ghost" size="sm" onClick={async () => { await signOut(); navigate("/"); }}>

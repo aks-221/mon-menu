@@ -23,7 +23,7 @@ const HeroSection = () => {
               <span className="text-gradient">en 5 minutes</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg">
-              MenuUp permet à n'importe quel restaurant de créer une page professionnelle 
+              SamaMenu permet à n'importe quel restaurant de créer une page professionnelle 
               avec menu, commandes en ligne et WhatsApp — sans aucune compétence technique.
             </p>
 

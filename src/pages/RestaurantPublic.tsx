@@ -619,7 +619,7 @@ const RestaurantPublic = () => {
           <div className="border-t border-gray-800 mt-8 pt-6 text-center">
             <p className="text-sm text-gray-500">
               © {new Date().getFullYear()} {restaurant.name}. Tous droits réservés. Propulsé par{" "}
-              <Link to="/" className="font-semibold hover:underline" style={{ color: brand }}>MenuUp</Link>
+              <Link to="/" className="font-semibold hover:underline" style={{ color: brand }}>SamaMenu</Link>
             </p>
           </div>
         </div>

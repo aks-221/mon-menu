@@ -148,7 +148,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background flex">
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 h-14 flex items-center justify-between">
         <button onClick={() => setSidebarOpen(true)}><Menu className="h-6 w-6" /></button>
-        <span className="font-extrabold">Menu<span className="text-primary">Up</span></span>
+        <span className="font-extrabold">Sama<span className="text-primary">Menu</span></span>
         <Link to={`/restaurant/${restaurant.slug}`}><Eye className="h-5 w-5 text-muted-foreground" /></Link>
       </div>
 
@@ -156,7 +156,7 @@ const Dashboard = () => {
         <div className="md:hidden fixed inset-0 z-50 bg-foreground/50" onClick={() => setSidebarOpen(false)}>
           <div className="w-64 h-full bg-card p-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-8">
-              <span className="font-extrabold text-lg">Menu<span className="text-primary">Up</span></span>
+              <span className="font-extrabold text-lg">Sama<span className="text-primary">Menu</span></span>
               <button onClick={() => setSidebarOpen(false)}><X className="h-5 w-5" /></button>
             </div>
             <SidebarNav items={navItems} active={activeTab} onSelect={(id) => { setActiveTab(id); setSidebarOpen(false); }} badges={{ orders: orderCount, reservations: reservationCount }} />
@@ -166,7 +166,7 @@ const Dashboard = () => {
 
       <aside className="hidden md:flex w-64 border-r border-border bg-card flex-col p-4">
         <div className="mb-8">
-          <Link to="/" className="font-extrabold text-lg">Menu<span className="text-primary">Up</span></Link>
+          <Link to="/" className="font-extrabold text-lg">Sama<span className="text-primary">Menu</span></Link>
           <p className="text-xs text-muted-foreground mt-1">{restaurant.name}</p>
         </div>
         <SidebarNav items={navItems} active={activeTab} onSelect={setActiveTab} badges={{ orders: orderCount, reservations: reservationCount }} />

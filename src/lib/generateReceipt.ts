@@ -110,7 +110,7 @@ export function generateReceipt(data: ReceiptData) {
 
   line();
   center("Merci pour votre commande !", 8);
-  center("Powered by MenuUp", 6);
+  center("Powered by SamaMenu", 6);
 
   // Save
   doc.save(`recu-${data.orderId.slice(0, 8)}.pdf`);
@@ -197,7 +197,7 @@ export function generateReservationReceipt(data: ReservationReceiptData) {
   y += 2;
   line();
   center("Merci pour votre reservation !", 8);
-  center("Powered by MenuUp", 6);
+  center("Powered by SamaMenu", 6);
 
   doc.save(`reservation-${data.reservationId.slice(0, 8)}.pdf`);
 }

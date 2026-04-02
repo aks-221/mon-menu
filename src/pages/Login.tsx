@@ -32,7 +32,7 @@ const Login = () => {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <Link to="/" className="text-2xl font-extrabold">
-            Menu<span className="text-primary">Up</span>
+            Sama<span className="text-primary">Menu</span>
           </Link>
           <h1 className="mt-6 text-2xl font-bold">Bon retour ! 👋</h1>
           <p className="mt-2 text-muted-foreground text-sm">
