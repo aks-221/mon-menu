@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Login = () => {
@@ -19,12 +20,23 @@ const Login = () => {
     if (!email || !password) return toast.error("Remplissez tous les champs");
     setLoading(true);
     const { error } = await signIn(email, password);
-    setLoading(false);
     if (error) {
+      setLoading(false);
       toast.error("Email ou mot de passe incorrect");
-    } else {
-      navigate("/dashboard");
+      return;
     }
+    // Check if user is admin
+    const { data: { user: loggedUser } } = await supabase.auth.getUser();
+    if (loggedUser) {
+      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", loggedUser.id).eq("role", "admin");
+      if (roles && roles.length > 0) {
+        setLoading(false);
+        navigate("/admin");
+        return;
+      }
+    }
+    setLoading(false);
+    navigate("/dashboard");
   };
 
   return (
