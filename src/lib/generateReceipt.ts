@@ -115,3 +115,89 @@ export function generateReceipt(data: ReceiptData) {
   // Save
   doc.save(`recu-${data.orderId.slice(0, 8)}.pdf`);
 }
+
+interface ReservationReceiptData {
+  restaurantName: string;
+  restaurantPhone?: string;
+  restaurantAddress?: string;
+  reservationId: string;
+  customerName: string;
+  customerPhone: string;
+  reservationDate: string;
+  reservationTime: string;
+  partySize: number;
+  status: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export function generateReservationReceipt(data: ReservationReceiptData) {
+  const doc = new jsPDF({ unit: "mm", format: [80, 160] });
+  const w = 80;
+  let y = 10;
+
+  const center = (text: string, size: number) => {
+    doc.setFontSize(size);
+    const tw = doc.getTextWidth(text);
+    doc.text(text, (w - tw) / 2, y);
+    y += size * 0.5 + 1;
+  };
+
+  const line = () => {
+    doc.setDrawColor(180);
+    doc.setLineWidth(0.3);
+    doc.line(5, y, w - 5, y);
+    y += 3;
+  };
+
+  // Header
+  doc.setFont("helvetica", "bold");
+  center(data.restaurantName.toUpperCase(), 12);
+  y += 1;
+
+  doc.setFont("helvetica", "normal");
+  if (data.restaurantAddress) center(data.restaurantAddress, 7);
+  if (data.restaurantPhone) center(`Tel: ${data.restaurantPhone}`, 7);
+  y += 2;
+  line();
+
+  // Title
+  doc.setFont("helvetica", "bold");
+  center("CONFIRMATION DE RESERVATION", 9);
+  y += 2;
+  line();
+
+  // Reservation info
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7);
+  doc.text(`Ref: #${data.reservationId.slice(0, 8).toUpperCase()}`, 5, y); y += 4;
+  doc.text(`Date: ${new Date(data.reservationDate).toLocaleDateString("fr-FR")}`, 5, y); y += 4;
+  doc.text(`Heure: ${data.reservationTime.slice(0, 5)}`, 5, y); y += 4;
+  doc.text(`Personnes: ${data.partySize}`, 5, y); y += 4;
+  y += 1;
+  line();
+
+  doc.text(`Client: ${data.customerName}`, 5, y); y += 4;
+  doc.text(`Tel: ${data.customerPhone}`, 5, y); y += 4;
+
+  const statusLabels: Record<string, string> = {
+    en_attente: "En attente",
+    acceptee: "Acceptee",
+    refusee: "Refusee",
+  };
+  doc.setFont("helvetica", "bold");
+  doc.text(`Statut: ${statusLabels[data.status] || data.status}`, 5, y); y += 4;
+  doc.setFont("helvetica", "normal");
+
+  if (data.notes) {
+    y += 1;
+    doc.text(`Notes: ${data.notes}`, 5, y, { maxWidth: w - 10 }); y += 6;
+  }
+
+  y += 2;
+  line();
+  center("Merci pour votre reservation !", 8);
+  center("Powered by MenuUp", 6);
+
+  doc.save(`reservation-${data.reservationId.slice(0, 8)}.pdf`);
+}
