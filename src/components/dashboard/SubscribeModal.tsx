@@ -16,10 +16,11 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  const WAVE_PAYMENT_LINK = "https://pay.wave.com/m/M_sn_n03HK-9PsJV3/c/sn/?amount=6600";
+
   const handleSubscribe = async (method: string) => {
     setLoading(true);
     try {
-      // For MVP: create subscription entry (manual validation by admin)
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 30);
 
@@ -34,15 +35,18 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
 
       if (error) throw error;
 
-      // Send WhatsApp notification
-      const msg = encodeURIComponent(
-        `Bonjour, je souhaite m'abonner à SamaMenu Pro (6 600 FCFA/mois).\n\nRestaurant: ${restaurant.name}\nMéthode: ${method}`
-      );
-      window.open(`https://wa.me/221700000000?text=${msg}`, "_blank");
+      if (method === "Wave") {
+        window.open(WAVE_PAYMENT_LINK, "_blank");
+      } else {
+        const msg = encodeURIComponent(
+          `Bonjour, je souhaite m'abonner à SamaMenu Pro (6 600 FCFA/mois).\n\nRestaurant: ${restaurant.name}\nMéthode: ${method}`
+        );
+        window.open(`https://wa.me/221700000000?text=${msg}`, "_blank");
+      }
 
       toast({
         title: "Demande envoyée !",
-        description: "Nous allons valider votre abonnement sous 24h.",
+        description: "Après paiement, votre abonnement sera activé sous 24h.",
       });
 
       onSuccess();
