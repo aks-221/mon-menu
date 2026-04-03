@@ -31,6 +31,8 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/restaurant/:slug" element={<RestaurantPublic />} />
             <Route path="/demo" element={<RestaurantPublic />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
