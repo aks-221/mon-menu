@@ -11,6 +11,8 @@ import Dashboard from "./pages/Dashboard.tsx";
 import RestaurantPublic from "./pages/RestaurantPublic.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Terms from "./pages/Terms.tsx";
+import Privacy from "./pages/Privacy.tsx";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,8 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/restaurant/:slug" element={<RestaurantPublic />} />
             <Route path="/demo" element={<RestaurantPublic />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
