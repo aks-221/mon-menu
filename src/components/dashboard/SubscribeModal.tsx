@@ -86,15 +86,14 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
 
           <div className="grid gap-2">
             <Button
-              variant="outline"
-              className="w-full justify-start gap-3 py-5 rounded-xl"
+              className="w-full justify-start gap-3 py-5 rounded-xl gradient-primary text-primary-foreground"
               onClick={() => handleSubscribe("Wave")}
               disabled={loading}
             >
-              <Banknote className="h-5 w-5 text-primary" />
+              <Smartphone className="h-5 w-5" />
               <div className="text-left">
-                <div className="font-medium">Wave / Orange Money</div>
-                <div className="text-xs text-muted-foreground">Paiement mobile</div>
+                <div className="font-medium">Payer avec Wave</div>
+                <div className="text-xs opacity-80">Paiement mobile instantané</div>
               </div>
             </Button>
 
