@@ -37,16 +37,19 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
 
       if (method === "Wave") {
         window.open(WAVE_PAYMENT_LINK, "_blank");
-      } else {
-        const msg = encodeURIComponent(
-          `Bonjour, je souhaite m'abonner à SamaMenu Pro (6 600 FCFA/mois).\n\nRestaurant: ${restaurant.name}\nMéthode: ${method}`
-        );
-        window.open(`https://wa.me/221700000000?text=${msg}`, "_blank");
       }
 
+      // Redirect to WhatsApp to send payment proof
+      const proofMsg = encodeURIComponent(
+        `Bonjour, je viens de payer mon abonnement SamaMenu Pro (6 600 FCFA/mois).\n\nRestaurant: ${restaurant.name}\nMéthode: ${method}\n\nVeuillez trouver ci-joint la capture du paiement.`
+      );
+      setTimeout(() => {
+        window.open(`https://wa.me/221778177575?text=${proofMsg}`, "_blank");
+      }, method === "Wave" ? 2000 : 0);
+
       toast({
-        title: "Demande envoyée !",
-        description: "Après paiement, votre abonnement sera activé sous 24h.",
+        title: "Paiement initié !",
+        description: "Envoyez la capture de paiement via WhatsApp pour activer votre abonnement.",
       });
 
       onSuccess();
