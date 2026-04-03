@@ -115,7 +115,7 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
           </div>
 
           <p className="text-xs text-center text-muted-foreground">
-            Après paiement, votre abonnement sera activé sous 24h.
+            Après paiement, envoyez la capture via WhatsApp pour activation immédiate.
           </p>
         </div>
       </DialogContent>
