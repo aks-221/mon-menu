@@ -25,6 +25,8 @@ const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate
     logo_url: restaurant.logo_url || "",
     cover_url: restaurant.cover_url || "",
     reservation_enabled: restaurant.reservation_enabled || false,
+    latitude: restaurant.latitude || null,
+    longitude: restaurant.longitude || null,
   });
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
