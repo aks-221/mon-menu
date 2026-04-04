@@ -372,7 +372,17 @@ const RestaurantPublic = () => {
           <div className="grid md:grid-cols-2 gap-8 mt-10">
             {/* Map embed */}
             <div className="rounded-xl overflow-hidden h-72 md:h-80 bg-gray-100">
-              {restaurant.address ? (
+              {restaurant.latitude && restaurant.longitude ? (
+                <iframe
+                  title="location"
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${restaurant.longitude - 0.01}%2C${restaurant.latitude - 0.01}%2C${restaurant.longitude + 0.01}%2C${restaurant.latitude + 0.01}&layer=mapnik&marker=${restaurant.latitude}%2C${restaurant.longitude}`}
+                  allowFullScreen
+                  loading="lazy"
+                />
+              ) : restaurant.address ? (
                 <iframe
                   title="location"
                   width="100%"
@@ -403,7 +413,18 @@ const RestaurantPublic = () => {
                 </div>
               )}
 
-              {restaurant.address && (
+              {(restaurant.latitude && restaurant.longitude) ? (
+                <a
+                  href={`https://www.google.com/maps?q=${restaurant.latitude},${restaurant.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-white font-semibold text-sm transition-transform hover:scale-105"
+                  style={{ backgroundColor: brand }}
+                >
+                  <MapPinned className="h-4 w-4" />
+                  Voir sur Google Maps
+                </a>
+              ) : restaurant.address && (
                 <a
                   href={`https://maps.google.com/?q=${encodeURIComponent(restaurant.address)}`}
                   target="_blank"
@@ -412,7 +433,7 @@ const RestaurantPublic = () => {
                   style={{ backgroundColor: brand }}
                 >
                   <MapPinned className="h-4 w-4" />
-                  Ouvrir dans Google Maps
+                  Voir sur Google Maps
                 </a>
               )}
             </div>

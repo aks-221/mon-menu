@@ -353,7 +353,9 @@ export type Database = {
           description: string | null
           id: string
           is_published: boolean | null
+          latitude: number | null
           logo_url: string | null
+          longitude: number | null
           name: string
           phone: string | null
           primary_color: string | null
@@ -377,7 +379,9 @@ export type Database = {
           description?: string | null
           id?: string
           is_published?: boolean | null
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name: string
           phone?: string | null
           primary_color?: string | null
@@ -401,7 +405,9 @@ export type Database = {
           description?: string | null
           id?: string
           is_published?: boolean | null
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name?: string
           phone?: string | null
           primary_color?: string | null

@@ -8,6 +8,7 @@ import { Save, Loader2, Upload, Image as ImageIcon } from "lucide-react";
 import { updateRestaurant } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import LocationPicker from "./LocationPicker";
 
 const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate: (r: any) => void }) => {
   const [profile, setProfile] = useState({
@@ -24,6 +25,8 @@ const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate
     logo_url: restaurant.logo_url || "",
     cover_url: restaurant.cover_url || "",
     reservation_enabled: restaurant.reservation_enabled || false,
+    latitude: restaurant.latitude || null,
+    longitude: restaurant.longitude || null,
   });
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -165,6 +168,16 @@ const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate
         <div className="space-y-2">
           <Label>Adresse</Label>
           <Input value={profile.address} onChange={(e) => setProfile({ ...profile, address: e.target.value })} className="rounded-xl" />
+        </div>
+
+        {/* Location map */}
+        <div className="space-y-2">
+          <Label>Emplacement sur la carte</Label>
+          <LocationPicker
+            latitude={profile.latitude}
+            longitude={profile.longitude}
+            onLocationChange={(lat, lng) => setProfile({ ...profile, latitude: lat, longitude: lng })}
+          />
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-2">
