@@ -369,9 +369,9 @@ const RestaurantPublic = () => {
           <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 italic">Notre Emplacement</h2>
           <p className="text-center text-gray-500 mt-2">Venez nous rendre visite</p>
 
-          <div className="grid md:grid-cols-2 gap-8 mt-10">
+          <div className="mt-10 space-y-8">
             {/* Map embed */}
-            <div className="rounded-xl overflow-hidden h-72 md:h-80 bg-gray-100">
+            <div className="rounded-xl overflow-hidden h-80 md:h-96 bg-gray-100">
               {restaurant.latitude && restaurant.longitude ? (
                 <iframe
                   title="location"
