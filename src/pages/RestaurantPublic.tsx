@@ -400,7 +400,7 @@ const RestaurantPublic = () => {
             </div>
 
             {/* Address info */}
-            <div className="flex flex-col justify-center">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               {restaurant.address && (
                 <div className="flex items-start gap-3 mb-6">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: brandLight }}>
