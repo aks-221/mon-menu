@@ -59,7 +59,7 @@ const PaywallPage = ({ onSubscribe }: PaywallPageProps) => {
 
           <div className="text-center">
             <a
-              href="https://wa.me/221700000000?text=Bonjour%2C%20je%20souhaite%20m'abonner%20à%20SamaMenu"
+              href="https://wa.me/221778177575?text=Bonjour%2C%20je%20souhaite%20m'abonner%20à%20SamaMenu"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"

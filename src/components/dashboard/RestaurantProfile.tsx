@@ -152,7 +152,7 @@ const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate
           <Input value={profile.slogan} onChange={(e) => setProfile({ ...profile, slogan: e.target.value })} className="rounded-xl" />
         </div>
         <div className="space-y-2">
-          <Label>Description</Label>
+          <Label>A Propos</Label>
           <Textarea value={profile.description} onChange={(e) => setProfile({ ...profile, description: e.target.value })} className="rounded-xl min-h-[100px]" />
         </div>
         <div className="grid sm:grid-cols-2 gap-4">

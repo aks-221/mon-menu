@@ -4,7 +4,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { useRef } from "react";
 
 const QrCodeView = ({ restaurant }: { restaurant: any }) => {
-  const url = `${window.location.origin}/restaurant/${restaurant.slug}`;
+  const url = `${window.location.origin}/${restaurant.slug}`;
   const qrRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = () => {

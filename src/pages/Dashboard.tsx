@@ -149,7 +149,7 @@ const Dashboard = () => {
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border px-4 h-14 flex items-center justify-between">
         <button onClick={() => setSidebarOpen(true)}><Menu className="h-6 w-6" /></button>
         <span className="font-extrabold">Sama<span className="text-primary">Menu</span></span>
-        <Link to={`/restaurant/${restaurant.slug}`}><Eye className="h-5 w-5 text-muted-foreground" /></Link>
+        <Link to={`/${restaurant.slug}`}><Eye className="h-5 w-5 text-muted-foreground" /></Link>
       </div>
 
       {sidebarOpen && (
@@ -171,7 +171,7 @@ const Dashboard = () => {
         </div>
         <SidebarNav items={navItems} active={activeTab} onSelect={setActiveTab} badges={{ orders: orderCount, reservations: reservationCount }} />
         <div className="mt-auto space-y-2">
-          <Link to={`/restaurant/${restaurant.slug}`}>
+          <Link to={`/${restaurant.slug}`}>
             <Button variant="outline" size="sm" className="w-full justify-start gap-2"><Eye className="h-4 w-4" /> Voir ma page</Button>
           </Link>
           <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-muted-foreground" onClick={handleSignOut}>
@@ -180,7 +180,7 @@ const Dashboard = () => {
         </div>
       </aside>
 
-      <main className="flex-1 md:p-6 p-4 pt-18 md:pt-6 overflow-auto">
+      <main className="flex-1 md:p-6 p-4 pt-16 md:pt-6 overflow-auto">
         {!isSubscribed && isTrialActive && (
           <TrialBanner daysLeft={trialDaysLeft} isSubscribed={isSubscribed} onSubscribe={() => setShowSubscribeModal(true)} />
         )}

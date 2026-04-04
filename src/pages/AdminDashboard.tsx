@@ -190,7 +190,7 @@ const AdminDashboard = () => {
                         <Badge variant={r.is_published ? "default" : "secondary"} className="text-[10px]">
                           {r.is_published ? "Publié" : "Brouillon"}
                         </Badge>
-                        <Link to={`/restaurant/${r.slug}`}>
+                        <Link to={`/${r.slug}`}>
                           <Button variant="ghost" size="icon" className="h-7 w-7">
                             <Eye className="h-3.5 w-3.5" />
                           </Button>
@@ -240,7 +240,7 @@ const AdminDashboard = () => {
                         </Badge>
                         {r.delivery_enabled && <Badge variant="outline" className="text-[10px]">Livraison</Badge>}
                         {r.reservation_enabled && <Badge variant="outline" className="text-[10px]">Résa</Badge>}
-                        <Link to={`/restaurant/${r.slug}`}>
+                        <Link to={`/${r.slug}`}>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
                             <ArrowUpRight className="h-4 w-4" />
                           </Button>

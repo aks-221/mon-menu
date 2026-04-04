@@ -76,7 +76,7 @@ const DashboardHome = ({ restaurant, onNavigate }: { restaurant: any; onNavigate
 
       <div className="bg-primary/5 rounded-2xl p-5 border border-primary/20">
         <p className="text-sm">
-          🔗 Votre page est accessible à : <strong className="text-primary">samamenu.app/{restaurant.slug}</strong>
+          🔗 Votre page est accessible à : <a href={`/${restaurant.slug}`} target="_blank" rel="noopener noreferrer" className="text-primary font-bold underline">{window.location.host}/{restaurant.slug}</a>
         </p>
       </div>
     </div>

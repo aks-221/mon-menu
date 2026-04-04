@@ -143,13 +143,7 @@ const RestaurantPublic = () => {
                 {s.label}
               </button>
             ))}
-            {whatsappNumber && (
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white" style={{ backgroundColor: brand }}>
-                  <Phone className="h-4 w-4" /> Commander
-                </button>
-              </a>
-            )}
+              
           </div>
 
           {/* Mobile hamburger */}
@@ -207,17 +201,7 @@ const RestaurantPublic = () => {
             </div>
 
             {/* CTA */}
-            {whatsappNumber && (
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="mt-5">
-                <button
-                  className="flex items-center gap-2 px-8 py-3.5 rounded-full text-white font-bold text-base transition-transform hover:scale-105 active:scale-95"
-                  style={{ backgroundColor: brand, boxShadow: `0 4px 20px ${brand}50` }}
-                >
-                  <Phone className="h-5 w-5" />
-                  Commander sur WhatsApp
-                </button>
-              </a>
-            )}
+    
 
             <ChevronDown className="h-6 w-6 text-white/50 mt-8 animate-bounce" />
           </div>
