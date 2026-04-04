@@ -169,6 +169,16 @@ const RestaurantProfile = ({ restaurant, onUpdate }: { restaurant: any; onUpdate
           <Label>Adresse</Label>
           <Input value={profile.address} onChange={(e) => setProfile({ ...profile, address: e.target.value })} className="rounded-xl" />
         </div>
+
+        {/* Location map */}
+        <div className="space-y-2">
+          <Label>Emplacement sur la carte</Label>
+          <LocationPicker
+            latitude={profile.latitude}
+            longitude={profile.longitude}
+            onLocationChange={(lat, lng) => setProfile({ ...profile, latitude: lat, longitude: lng })}
+          />
+        </div>
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Facebook</Label>
