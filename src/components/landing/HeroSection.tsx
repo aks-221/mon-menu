@@ -40,11 +40,11 @@ const HeroSection = () => {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Link to="/demo">
+              <a href="https://youtu.be/-hkm-VLRigw?si=CJUPvIQuCLnFsUQL" target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" size="lg" className="text-base px-8 py-6 rounded-xl border-2">
                   Voir une démo
                 </Button>
-              </Link>
+              </a>
             </div>
             <p className="text-sm text-muted-foreground">
               ✓ Sans carte bancaire — ✓ Accès complet — ✓ Annulez à tout moment
