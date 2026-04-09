@@ -126,7 +126,7 @@ export const fetchBusinessHours = async (restaurantId: string) => {
 export const updateRestaurant = async (id: string, updates: Record<string, unknown>) => {
   const { error } = await supabase
     .from("restaurants")
-    .update(updates)
+    .update(updates as any)
     .eq("id", id);
   if (error) throw error;
 };
@@ -154,7 +154,7 @@ export const addDish = async (dish: {
 export const updateDish = async (id: string, updates: Record<string, unknown>) => {
   const { error } = await supabase
     .from("dishes")
-    .update(updates)
+    .update(updates as any)
     .eq("id", id);
   if (error) throw error;
 };
