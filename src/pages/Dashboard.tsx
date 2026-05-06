@@ -159,7 +159,17 @@ const Dashboard = () => {
               <span className="font-extrabold text-lg">Sama<span className="text-primary">Menu</span></span>
               <button onClick={() => setSidebarOpen(false)}><X className="h-5 w-5" /></button>
             </div>
-            <SidebarNav items={navItems} active={activeTab} onSelect={(id) => { setActiveTab(id); setSidebarOpen(false); }} badges={{ orders: orderCount, reservations: reservationCount }} />
+            <div className="flex flex-col h-[calc(100%-4rem)]">
+              <SidebarNav items={navItems} active={activeTab} onSelect={(id) => { setActiveTab(id); setSidebarOpen(false); }} badges={{ orders: orderCount, reservations: reservationCount }} />
+              <div className="mt-auto space-y-2 pt-4 border-t border-border">
+                <Link to={`/${restaurant.slug}`} onClick={() => setSidebarOpen(false)}>
+                  <Button variant="outline" size="sm" className="w-full justify-start gap-2"><Eye className="h-4 w-4" /> Voir ma page</Button>
+                </Link>
+                <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-muted-foreground" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4" /> Déconnexion
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}

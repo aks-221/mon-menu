@@ -31,7 +31,7 @@ const PricingSection = () => {
             <span className="text-gradient">puis décidez</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto text-lg">
-            Accès complet pendant 15 jours, sans carte bancaire. Continuez à seulement 6 600 FCFA/mois.
+            Accès complet pendant 15 jours, sans carte bancaire. Continuez à seulement 5 500 FCFA/mois.
           </p>
         </motion.div>
 
@@ -53,7 +53,7 @@ const PricingSection = () => {
                 Tout ce qu'il faut pour gérer votre restaurant en ligne
               </p>
               <div className="flex items-baseline justify-center gap-1">
-                <span className="text-5xl font-extrabold">6 600</span>
+                <span className="text-5xl font-extrabold">5 500</span>
                 <span className="text-muted-foreground text-sm">FCFA / mois</span>
               </div>
               <p className="text-xs text-muted-foreground mt-2">

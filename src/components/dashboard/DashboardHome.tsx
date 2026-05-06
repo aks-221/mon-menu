@@ -1,10 +1,36 @@
 import { useState, useEffect } from "react";
-import { UtensilsCrossed, Eye, TrendingUp, MessageCircle, Package, Truck, CalendarDays } from "lucide-react";
+import { UtensilsCrossed, Eye, TrendingUp, MessageCircle, Package, Truck, CalendarDays, Copy, Share2, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const DashboardHome = ({ restaurant, onNavigate }: { restaurant: any; onNavigate: (tab: string) => void }) => {
   const [orderCount, setOrderCount] = useState(0);
   const [reservationCount, setReservationCount] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const pageUrl = `${window.location.origin}/${restaurant.slug}`;
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+      setCopied(true);
+      toast.success("Lien copié !");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Impossible de copier le lien");
+    }
+  };
+  const handleShare = async () => {
+    const shareData = {
+      title: restaurant.name,
+      text: `Découvrez le menu de ${restaurant.name}`,
+      url: pageUrl,
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch {}
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(`${shareData.text} ${pageUrl}`)}`, "_blank");
+    }
+  };
 
   useEffect(() => {
     supabase.from("orders").select("id", { count: "exact", head: true })
@@ -74,10 +100,20 @@ const DashboardHome = ({ restaurant, onNavigate }: { restaurant: any; onNavigate
         </button>
       </div>
 
-      <div className="bg-primary/5 rounded-2xl p-5 border border-primary/20">
-        <p className="text-sm">
-          🔗 Votre page est accessible à : <a href={`/${restaurant.slug}`} target="_blank" rel="noopener noreferrer" className="text-primary font-bold underline">{window.location.host}/{restaurant.slug}</a>
+      <div className="bg-primary/5 rounded-2xl p-5 border border-primary/20 space-y-3">
+        <p className="text-sm break-all">
+          🔗 Votre page : <a href={`/${restaurant.slug}`} target="_blank" rel="noopener noreferrer" className="text-primary font-bold underline">{window.location.host}/{restaurant.slug}</a>
         </p>
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={handleCopy} className="rounded-lg gap-1.5">
+            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {copied ? "Copié" : "Copier le lien"}
+          </Button>
+          <Button size="sm" onClick={handleShare} className="gradient-primary text-primary-foreground rounded-lg gap-1.5">
+            <Share2 className="h-3.5 w-3.5" />
+            Partager
+          </Button>
+        </div>
       </div>
     </div>
   );

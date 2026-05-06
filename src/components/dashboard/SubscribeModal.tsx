@@ -18,7 +18,7 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
   const [paymentMethod, setPaymentMethod] = useState("");
   const { toast } = useToast();
 
-  const WAVE_PAYMENT_LINK = "https://pay.wave.com/m/M_sn_n03HK-9PsJV3/c/sn/?amount=6600";
+  const WAVE_PAYMENT_LINK = "https://pay.wave.com/m/M_sn_n03HK-9PsJV3/c/sn/?amount=5500";
 
   const handleSubscribe = async (method: string) => {
     setLoading(true);
@@ -30,7 +30,7 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
         restaurant_id: restaurant.id,
         status: "pending",
         plan_name: "pro",
-        price: 6600,
+        price: 5500,
         starts_at: new Date().toISOString(),
         expires_at: expiresAt.toISOString(),
       }, { onConflict: "restaurant_id" });
@@ -56,7 +56,7 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
 
   const handleSendProof = () => {
     const proofMsg = encodeURIComponent(
-      `Bonjour, je viens de payer mon abonnement SamaMenu Pro (6 600 FCFA/mois).\n\nRestaurant: ${restaurant.name}\nMéthode: ${paymentMethod}\n\nVeuillez trouver ci-joint la capture du paiement.`
+      `Bonjour, je viens de payer mon abonnement SamaMenu Pro (5 500 FCFA/mois).\n\nRestaurant: ${restaurant.name}\nMéthode: ${paymentMethod}\n\nVeuillez trouver ci-joint la capture du paiement.`
     );
     window.open(`https://wa.me/221778177575?text=${proofMsg}`, "_blank");
 
@@ -85,7 +85,7 @@ const SubscribeModal = ({ open, onOpenChange, restaurant, onSuccess }: Subscribe
         <DialogHeader>
           <DialogTitle className="text-xl font-extrabold">S'abonner à SamaMenu Pro</DialogTitle>
           <DialogDescription>
-            Accès complet à toutes les fonctionnalités pour 6 600 FCFA / mois
+            Accès complet à toutes les fonctionnalités pour 5 500 FCFA / mois
           </DialogDescription>
         </DialogHeader>
 
