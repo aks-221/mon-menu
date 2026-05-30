@@ -21,6 +21,7 @@ import TrialBanner from "@/components/dashboard/TrialBanner";
 import PaywallPage from "@/components/dashboard/PaywallPage";
 import SubscribeModal from "@/components/dashboard/SubscribeModal";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
   { id: "home", label: "Aperçu", icon: LayoutDashboard },
@@ -43,8 +44,33 @@ const Dashboard = () => {
   const [reservationCount, setReservationCount] = useState(0);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const { user, signOut, loading: authLoading } = useAuth();
-  const { trialDaysLeft, isTrialActive, isSubscribed, hasAccess, loading: subLoading } = useSubscription(restaurant);
+  const { trialDaysLeft, isTrialActive, isSubscribed, subscriptionDaysLeft, hasAccess, loading: subLoading, subscription } = useSubscription(restaurant);
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // Détecter le retour de paiement SenePay
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const payment = params.get("payment");
+
+    if (payment === "success") {
+      toast({
+        title: "🎉 Paiement réussi !",
+        description: "Votre abonnement SamaMenu Pro est maintenant actif.",
+      });
+      window.history.replaceState({}, "", "/dashboard");
+      window.location.reload();
+    }
+
+    if (payment === "cancel") {
+      toast({
+        title: "Paiement annulé",
+        description: "Votre paiement n'a pas abouti. Réessayez quand vous voulez.",
+        variant: "destructive",
+      });
+      window.history.replaceState({}, "", "/dashboard");
+    }
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -56,7 +82,6 @@ const Dashboard = () => {
         setRestaurant(r);
         setLoading(false);
         if (r) {
-          // Fetch counts
           supabase.from("orders").select("id", { count: "exact", head: true })
             .eq("restaurant_id", r.id).eq("status", "en_attente")
             .then(({ count }) => setOrderCount(count || 0));
@@ -64,7 +89,6 @@ const Dashboard = () => {
             .eq("restaurant_id", r.id).eq("status", "en_attente")
             .then(({ count }) => setReservationCount(count || 0));
 
-          // Realtime subscriptions for counts
           const ordersChannel = supabase.channel("orders-count")
             .on("postgres_changes", { event: "*", schema: "public", table: "orders", filter: `restaurant_id=eq.${r.id}` }, () => {
               supabase.from("orders").select("id", { count: "exact", head: true })
@@ -191,11 +215,16 @@ const Dashboard = () => {
       </aside>
 
       <main className="flex-1 md:p-6 p-4 pt-16 md:pt-6 overflow-auto">
-        {!isSubscribed && isTrialActive && (
-          <TrialBanner daysLeft={trialDaysLeft} isSubscribed={isSubscribed} onSubscribe={() => setShowSubscribeModal(true)} />
-        )}
+        <TrialBanner
+          daysLeft={trialDaysLeft}
+          isSubscribed={isSubscribed}
+          subscriptionDaysLeft={subscriptionDaysLeft}
+          subscriptionExpiresAt={subscription?.expires_at}
+          onSubscribe={() => setShowSubscribeModal(true)}
+        />
         {renderContent()}
       </main>
+
       <SubscribeModal
         open={showSubscribeModal}
         onOpenChange={setShowSubscribeModal}

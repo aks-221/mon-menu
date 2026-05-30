@@ -19,7 +19,6 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"overview" | "restaurants" | "users" | "subscriptions">("overview");
 
-  // Stats
   const [stats, setStats] = useState({
     totalRestaurants: 0,
     publishedRestaurants: 0,
@@ -74,7 +73,11 @@ const AdminDashboard = () => {
   };
 
   if (authLoading || loading) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
   if (!isAdmin) return null;
@@ -103,7 +106,7 @@ const AdminDashboard = () => {
         {/* Sidebar */}
         <aside className="hidden md:flex w-56 border-r border-border bg-card flex-col p-4 min-h-[calc(100vh-3.5rem)]">
           <nav className="space-y-1">
-             {([
+            {([
               { id: "overview" as const, label: "Vue d'ensemble", icon: LayoutDashboard },
               { id: "restaurants" as const, label: "Restaurants", icon: Store },
               { id: "subscriptions" as const, label: "Abonnements", icon: CreditCard },
@@ -140,6 +143,8 @@ const AdminDashboard = () => {
 
         {/* Content */}
         <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6">
+
+          {/* Vue d'ensemble */}
           {activeTab === "overview" && (
             <div className="space-y-6">
               <h1 className="text-2xl font-bold">Vue d'ensemble</h1>
@@ -165,7 +170,6 @@ const AdminDashboard = () => {
                 ))}
               </div>
 
-              {/* Recent restaurants */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base">Derniers restaurants inscrits</CardTitle>
@@ -203,6 +207,7 @@ const AdminDashboard = () => {
             </div>
           )}
 
+          {/* Restaurants */}
           {activeTab === "restaurants" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -210,7 +215,12 @@ const AdminDashboard = () => {
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Rechercher un restaurant..." className="pl-9" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+                <Input
+                  placeholder="Rechercher un restaurant..."
+                  className="pl-9"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 {filteredRestaurants.map(r => (
@@ -256,14 +266,16 @@ const AdminDashboard = () => {
             </div>
           )}
 
+          {/* Abonnements */}
           {activeTab === "subscriptions" && (
-            <SubscriptionsTab 
-              restaurants={restaurants} 
-              subscriptions={subscriptions} 
-              onReload={loadData} 
+            <SubscriptionsTab
+              restaurants={restaurants}
+              subscriptions={subscriptions}
+              onReload={loadData}
             />
           )}
 
+          {/* Utilisateurs */}
           {activeTab === "users" && (
             <div className="space-y-4">
               <h1 className="text-2xl font-bold">Utilisateurs</h1>
@@ -290,14 +302,15 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
+
         </main>
       </div>
     </div>
   );
 };
 
-// Subscriptions management tab
-const SubscriptionsTab = ({ restaurants, subscriptions, onReload }: { 
+// Onglet Abonnements
+const SubscriptionsTab = ({ restaurants, subscriptions, onReload }: {
   restaurants: any[]; subscriptions: any[]; onReload: () => void;
 }) => {
   const activateSub = async (restaurantId: string) => {
@@ -321,9 +334,40 @@ const SubscriptionsTab = ({ restaurants, subscriptions, onReload }: {
     onReload();
   };
 
+  // Stats
+  const totalActifs = subscriptions.filter(s =>
+    s.status === "active" && new Date(s.expires_at) > new Date()
+  ).length;
+  const totalPending = subscriptions.filter(s => s.status === "pending").length;
+  const totalExpires = subscriptions.filter(s =>
+    s.status === "expired" || (s.status === "active" && new Date(s.expires_at) <= new Date())
+  ).length;
+  const revenueTotal = subscriptions
+    .filter(s => s.status === "active")
+    .reduce((sum, s) => sum + (s.price || 0), 0);
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h1 className="text-2xl font-bold">Abonnements</h1>
+
+      {/* Cards stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Actifs", value: totalActifs, color: "text-green-600", bg: "bg-green-500/10" },
+          { label: "En attente", value: totalPending, color: "text-yellow-600", bg: "bg-yellow-500/10" },
+          { label: "Expirés", value: totalExpires, color: "text-destructive", bg: "bg-destructive/10" },
+          { label: "Revenus", value: revenueTotal.toLocaleString("fr-FR") + " FCFA", color: "text-primary", bg: "bg-primary/10" },
+        ].map(s => (
+          <Card key={s.label}>
+            <CardContent className={`p-4 rounded-xl ${s.bg}`}>
+              <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Liste */}
       <div className="space-y-2">
         {restaurants.map(r => {
           const sub = subscriptions.find(s => s.restaurant_id === r.id);
@@ -331,10 +375,12 @@ const SubscriptionsTab = ({ restaurants, subscriptions, onReload }: {
           const isPending = sub?.status === "pending";
           const trialEnd = new Date(r.trial_ends_at);
           const trialActive = trialEnd > new Date();
-          const trialDays = Math.max(0, Math.ceil((trialEnd.getTime() - Date.now()) / (1000*60*60*24)));
+          const trialDays = Math.max(0, Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+          const expiresSoon = isActive && sub?.expires_at &&
+            Math.ceil((new Date(sub.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)) <= 5;
 
           return (
-            <Card key={r.id}>
+            <Card key={r.id} className={expiresSoon ? "border-yellow-400" : isPending ? "border-yellow-300" : ""}>
               <CardContent className="p-4 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   {r.logo_url ? (
@@ -346,35 +392,56 @@ const SubscriptionsTab = ({ restaurants, subscriptions, onReload }: {
                   )}
                   <div className="min-w-0">
                     <p className="font-semibold truncate">{r.name}</p>
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 flex-wrap mt-1">
                       {isActive ? (
                         <Badge className="bg-green-500/10 text-green-600 text-[10px] gap-1">
-                          <CheckCircle className="h-3 w-3" /> Abonné
+                          <CheckCircle className="h-3 w-3" /> Abonné via SenePay
                         </Badge>
                       ) : isPending ? (
                         <Badge className="bg-yellow-500/10 text-yellow-600 text-[10px] gap-1">
-                          <Clock className="h-3 w-3" /> En attente
+                          <Clock className="h-3 w-3" /> Paiement en attente
                         </Badge>
                       ) : trialActive ? (
                         <Badge variant="outline" className="text-[10px] gap-1">
-                          <Clock className="h-3 w-3" /> Essai ({trialDays}j)
+                          <Clock className="h-3 w-3" /> Essai ({trialDays}j restants)
                         </Badge>
                       ) : (
                         <Badge variant="destructive" className="text-[10px] gap-1">
                           <XCircle className="h-3 w-3" /> Expiré
                         </Badge>
                       )}
-                      {sub && <span className="text-[10px] text-muted-foreground">Expire: {new Date(sub.expires_at).toLocaleDateString("fr-FR")}</span>}
+                      {expiresSoon && (
+                        <Badge className="bg-yellow-500/10 text-yellow-600 text-[10px]">
+                          ⚠️ Expire bientôt
+                        </Badge>
+                      )}
                     </div>
+                    {sub && (
+                      <div className="text-[10px] text-muted-foreground mt-1 space-y-0.5">
+                        <p>Expire : {new Date(sub.expires_at).toLocaleDateString("fr-FR")}</p>
+                        {sub.payment_method && <p>Méthode : {sub.payment_method}</p>}
+                        {sub.payment_reference && <p>Réf : {sub.payment_reference}</p>}
+                        {sub.price && <p>Montant : {sub.price.toLocaleString("fr-FR")} FCFA</p>}
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex flex-col gap-2 flex-shrink-0">
                   {!isActive ? (
-                    <Button size="sm" className="gradient-primary text-primary-foreground rounded-lg text-xs" onClick={() => activateSub(r.id)}>
-                      Activer
+                    <Button
+                      size="sm"
+                      className="gradient-primary text-primary-foreground rounded-lg text-xs"
+                      onClick={() => activateSub(r.id)}
+                    >
+                      Activer manuellement
                     </Button>
                   ) : (
-                    <Button size="sm" variant="destructive" className="rounded-lg text-xs" onClick={() => deactivateSub(r.id)}>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="rounded-lg text-xs"
+                      onClick={() => deactivateSub(r.id)}
+                    >
                       Désactiver
                     </Button>
                   )}

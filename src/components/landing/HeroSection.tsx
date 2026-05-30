@@ -30,7 +30,7 @@ const HeroSection = () => {
             <div className="inline-flex items-center gap-2 rounded-xl bg-accent/10 border border-accent/20 px-4 py-2.5 text-sm">
               <Star className="h-4 w-4 text-accent fill-accent" />
               <span className="font-semibold text-accent">15 jours d'essai gratuit</span>
-              <span className="text-muted-foreground">puis 5 500 FCFA/mois</span>
+              <span className="text-muted-foreground">puis 6 600 FCFA/mois</span>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -87,7 +87,7 @@ const HeroSection = () => {
                       key={cat}
                       className="text-[8px] px-2 py-1 rounded-full font-semibold whitespace-nowrap"
                       style={i === 0
-                        ? { backgroundColor: "#16a34a", color: "#fff" }
+                        ? { backgroundColor: "#01a30a", color: "#fff" }
                         : { backgroundColor: "#f3f4f6", color: "#374151" }
                       }
                     >

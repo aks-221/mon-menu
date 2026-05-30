@@ -6,6 +6,7 @@ interface SubscriptionState {
   trialDaysLeft: number;
   isTrialActive: boolean;
   isSubscribed: boolean;
+  subscriptionDaysLeft: number;
   hasAccess: boolean;
   subscription: any | null;
 }
@@ -16,6 +17,7 @@ export const useSubscription = (restaurant: any) => {
     trialDaysLeft: 0,
     isTrialActive: false,
     isSubscribed: false,
+    subscriptionDaysLeft: 0,
     hasAccess: false,
     subscription: null,
   });
@@ -27,14 +29,15 @@ export const useSubscription = (restaurant: any) => {
     }
 
     const checkAccess = async () => {
-      // Calculate trial days
-      const trialEnd = new Date(restaurant.trial_ends_at);
       const now = new Date();
-      const diffMs = trialEnd.getTime() - now.getTime();
-      const trialDaysLeft = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+
+      // Calcul jours essai
+      const trialEnd = new Date(restaurant.trial_ends_at);
+      const diffTrial = trialEnd.getTime() - now.getTime();
+      const trialDaysLeft = Math.max(0, Math.ceil(diffTrial / (1000 * 60 * 60 * 24)));
       const isTrialActive = trialDaysLeft > 0;
 
-      // Check subscription
+      // Vérifier abonnement
       const { data: sub } = await supabase
         .from("subscriptions")
         .select("*")
@@ -43,11 +46,19 @@ export const useSubscription = (restaurant: any) => {
 
       const isSubscribed = sub?.status === "active" && new Date(sub.expires_at) > now;
 
+      // Calcul jours restants abonnement
+      let subscriptionDaysLeft = 0;
+      if (isSubscribed && sub?.expires_at) {
+        const diffSub = new Date(sub.expires_at).getTime() - now.getTime();
+        subscriptionDaysLeft = Math.max(0, Math.ceil(diffSub / (1000 * 60 * 60 * 24)));
+      }
+
       setState({
         loading: false,
         trialDaysLeft,
         isTrialActive,
         isSubscribed,
+        subscriptionDaysLeft,
         hasAccess: isTrialActive || isSubscribed,
         subscription: sub,
       });
