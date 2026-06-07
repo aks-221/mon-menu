@@ -35,7 +35,7 @@ const PaywallPage = ({ onSubscribe }: PaywallPageProps) => {
           <div className="text-center">
             <div className="text-sm text-muted-foreground mb-1">Plan SamaMenu Pro</div>
             <div className="flex items-baseline justify-center gap-1">
-              <span className="text-4xl font-extrabold">5 500</span>
+              <span className="text-4xl font-extrabold">6 600</span>
               <span className="text-muted-foreground text-sm">FCFA / mois</span>
             </div>
           </div>
